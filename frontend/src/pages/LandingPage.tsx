@@ -651,9 +651,126 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ══════════════════════ CTA BANNER (coming next) ══════════════════════ */}
+      {/* ══════════════════════ CTA BANNER ══════════════════════ */}
+      <section className="py-20 lg:py-28">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            {...motionProps}
+            variants={scaleIn}
+            className="relative overflow-hidden rounded-[2rem] bg-linear-to-br from-sky-600 via-cyan-600 to-blue-600 p-10 sm:p-14 text-center shadow-2xl shadow-sky-500/20"
+          >
+            {/* Decorative circles */}
+            <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/5 blur-2xl -translate-y-1/2 translate-x-1/3" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-white/5 blur-2xl translate-y-1/3 -translate-x-1/4" />
 
-      {/* ══════════════════════ FOOTER (coming next) ══════════════════════ */}
+            <div className="relative z-10">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white font-[Poppins,sans-serif] tracking-tight leading-tight">
+                Ready to Transform
+                <br />
+                Your Learning?
+              </h2>
+              <p className="mt-4 text-sky-100 text-lg max-w-xl mx-auto leading-relaxed">
+                Join thousands of students who are already studying smarter with
+                FlowLearn. Get started in seconds.
+              </p>
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  to="/register"
+                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-white text-sky-700 font-bold text-base shadow-xl hover:bg-sky-50 transition-all"
+                >
+                  Get Started — It's Free
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ══════════════════════ FOOTER ══════════════════════ */}
+      <footer className="bg-slate-900 text-slate-300 pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+            {/* Brand */}
+            <div className="sm:col-span-2 lg:col-span-1">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-9 h-9 rounded-xl bg-linear-to-br from-sky-500 to-cyan-400 flex items-center justify-center">
+                  <BookOpen className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-bold font-[Poppins,sans-serif] text-white">
+                  FlowLearn
+                </span>
+              </div>
+              <p className="text-sm leading-relaxed text-slate-400 max-w-xs">
+                AI-powered study platform that turns your documents into
+                effective learning experiences.
+              </p>
+              <div className="flex gap-3 mt-5">
+                {[
+                  { Icon: Twitter, href: "#" },
+                  { Icon: Github, href: "#" },
+                  { Icon: Linkedin, href: "#" },
+                  { Icon: Mail, href: "mailto:hello@flowlearn.ai" },
+                ].map(({ Icon, href }) => (
+                  <a
+                    key={Icon.displayName || Icon.name}
+                    href={href}
+                    className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-sky-600 flex items-center justify-center transition-colors"
+                    aria-label={Icon.displayName || Icon.name}
+                  >
+                    <Icon className="w-4 h-4" />
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Links columns */}
+            {[
+              {
+                title: "Product",
+                links: ["Features", "Pricing", "Roadmap", "Changelog"],
+              },
+              {
+                title: "Resources",
+                links: ["Documentation", "Blog", "Help Center", "Community"],
+              },
+              {
+                title: "Company",
+                links: ["About", "Careers", "Privacy Policy", "Terms of Service"],
+              },
+            ].map((col) => (
+              <div key={col.title}>
+                <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
+                  {col.title}
+                </h4>
+                <ul className="space-y-2.5">
+                  {col.links.map((link) => (
+                    <li key={link}>
+                      <a
+                        href="#"
+                        className="text-sm text-slate-400 hover:text-sky-400 transition-colors"
+                      >
+                        {link}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="border-t border-slate-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-slate-500">
+              © {new Date().getFullYear()} FlowLearn. All rights reserved.
+            </p>
+            <p className="text-xs text-slate-500">
+              Made with{" "}
+              <span className="text-red-400">♥</span> for students
+              everywhere
+            </p>
+          </div>
+        </div>
+      </footer>
 
     </div>
   );
