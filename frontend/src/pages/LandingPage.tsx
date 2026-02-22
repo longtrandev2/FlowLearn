@@ -303,7 +303,24 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ══════════════════════ TRUSTED BY (coming next) ══════════════════════ */}
+      {/* ══════════════════════ TRUSTED BY ══════════════════════ */}
+      <section className="py-12 border-y border-slate-100 bg-slate-50/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-xs font-semibold uppercase tracking-widest text-slate-400 mb-8">
+            Trusted by students at leading institutions
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+            {["Harvard University", "Stanford", "MIT", "Oxford", "Cambridge", "Yale"].map((name) => (
+              <span
+                key={name}
+                className="text-lg font-bold text-slate-300 hover:text-sky-400 transition-colors font-[Poppins,sans-serif] select-none"
+              >
+                {name}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ══════════════════════ FEATURES (coming next) ══════════════════════ */}
 
