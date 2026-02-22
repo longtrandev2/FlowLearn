@@ -515,7 +515,141 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ══════════════════════ PRICING (coming next) ══════════════════════ */}
+      {/* ══════════════════════ PRICING ══════════════════════ */}
+      <section
+        id="pricing"
+        className="py-20 lg:py-28 bg-linear-to-b from-slate-50 to-white"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div {...motionProps} variants={fadeUp} className="text-center max-w-2xl mx-auto mb-16">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs font-semibold mb-4 tracking-wide">
+              Pricing
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-[Poppins,sans-serif] tracking-tight">
+              Simple,{" "}
+              <span className="bg-linear-to-r from-sky-500 to-cyan-500 bg-clip-text text-transparent">
+                Transparent
+              </span>{" "}
+              Pricing
+            </h2>
+            <p className="mt-4 text-lg text-slate-500 leading-relaxed">
+              Start free and upgrade as you grow. No hidden fees.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
+            {[
+              {
+                name: "Free",
+                price: "$0",
+                period: "forever",
+                description: "Perfect for getting started",
+                features: ["5 document uploads", "Basic quiz generation", "Progress tracking", "Community support"],
+                cta: "Get Started",
+                highlighted: false,
+              },
+              {
+                name: "Pro",
+                price: "$9",
+                period: "per month",
+                description: "Best for serious learners",
+                features: ["Unlimited uploads", "Advanced AI quizzes", "Spaced repetition", "Detailed analytics", "Priority support", "Export flashcards"],
+                cta: "Start Free Trial",
+                highlighted: true,
+              },
+              {
+                name: "Team",
+                price: "$19",
+                period: "per user/month",
+                description: "For study groups & teams",
+                features: ["Everything in Pro", "Shared folders", "Team analytics", "Admin dashboard", "SSO integration", "Dedicated support"],
+                cta: "Contact Sales",
+                highlighted: false,
+              },
+            ].map((plan, i) => (
+              <motion.div
+                key={plan.name}
+                {...motionProps}
+                variants={fadeUp}
+                custom={i}
+                className={`relative p-8 rounded-3xl transition-all duration-300 ${
+                  plan.highlighted
+                    ? "bg-linear-to-b from-sky-600 to-cyan-600 text-white shadow-2xl shadow-sky-500/25 scale-[1.03] border-0"
+                    : "bg-white border border-slate-200 hover:border-sky-200 shadow-sm hover:shadow-xl hover:shadow-sky-500/5"
+                }`}
+              >
+                {plan.highlighted && (
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-orange-500 text-white text-xs font-bold shadow-lg">
+                    Most Popular
+                  </span>
+                )}
+
+                <h3
+                  className={`text-lg font-bold font-[Poppins,sans-serif] ${
+                    plan.highlighted ? "text-white" : "text-slate-800"
+                  }`}
+                >
+                  {plan.name}
+                </h3>
+                <p
+                  className={`text-sm mt-1 ${
+                    plan.highlighted ? "text-sky-100" : "text-slate-400"
+                  }`}
+                >
+                  {plan.description}
+                </p>
+
+                <div className="mt-6 mb-6">
+                  <span
+                    className={`text-4xl font-extrabold font-[Poppins,sans-serif] ${
+                      plan.highlighted ? "text-white" : "text-slate-900"
+                    }`}
+                  >
+                    {plan.price}
+                  </span>
+                  <span
+                    className={`text-sm ml-1 ${
+                      plan.highlighted ? "text-sky-200" : "text-slate-400"
+                    }`}
+                  >
+                    /{plan.period}
+                  </span>
+                </div>
+
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((feat) => (
+                    <li key={feat} className="flex items-center gap-2.5 text-sm">
+                      <Check
+                        className={`w-4 h-4 shrink-0 ${
+                          plan.highlighted ? "text-sky-200" : "text-sky-500"
+                        }`}
+                      />
+                      <span
+                        className={
+                          plan.highlighted ? "text-sky-50" : "text-slate-600"
+                        }
+                      >
+                        {feat}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Link
+                  to="/register"
+                  className={`block text-center font-semibold py-3 px-6 rounded-2xl transition-all text-sm ${
+                    plan.highlighted
+                      ? "bg-white text-sky-700 hover:bg-sky-50 shadow-lg"
+                      : "bg-slate-900 text-white hover:bg-slate-800 shadow-md"
+                  }`}
+                >
+                  {plan.cta}
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ══════════════════════ CTA BANNER (coming next) ══════════════════════ */}
 
