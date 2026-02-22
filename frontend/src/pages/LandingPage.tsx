@@ -322,7 +322,55 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ══════════════════════ FEATURES (coming next) ══════════════════════ */}
+      {/* ══════════════════════ FEATURES ══════════════════════ */}
+      <section id="features" className="py-20 lg:py-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div {...motionProps} variants={fadeUp} className="text-center max-w-2xl mx-auto mb-16">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs font-semibold mb-4 tracking-wide">
+              Features
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-[Poppins,sans-serif] tracking-tight">
+              Everything You Need to{" "}
+              <span className="bg-linear-to-r from-sky-500 to-cyan-500 bg-clip-text text-transparent">
+                Excel
+              </span>
+            </h2>
+            <p className="mt-4 text-lg text-slate-500 leading-relaxed">
+              Powerful tools designed to transform the way you study, retain, and
+              master any subject.
+            </p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {[
+              { icon: Brain, title: "AI Quiz Generation", description: "Automatically generate quizzes from your documents using advanced AI. Study smarter, not harder." },
+              { icon: BookOpen, title: "Smart Flashcards", description: "Transform your notes into interactive flashcards with spaced repetition for maximum retention." },
+              { icon: BarChart3, title: "Progress Analytics", description: "Track your learning journey with detailed insights, streaks, and performance charts." },
+              { icon: FolderOpen, title: "Document Library", description: "Organize all your study materials in one place with folders, tags, and quick search." },
+              { icon: Repeat2, title: "Spaced Repetition", description: "Our algorithm schedules reviews at optimal intervals so you remember more with less effort." },
+              { icon: Sparkles, title: "AI-Powered Feedback", description: "Get instant, personalized feedback on your answers to understand concepts deeply." },
+            ].map((f, i) => (
+              <motion.div
+                key={f.title}
+                {...motionProps}
+                variants={fadeUp}
+                custom={i}
+                className="group relative p-7 rounded-3xl bg-white border border-slate-100 hover:border-sky-200 shadow-sm hover:shadow-xl hover:shadow-sky-500/5 transition-all duration-300"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-sky-50 to-cyan-50 border border-sky-100 flex items-center justify-center mb-5 group-hover:from-sky-100 group-hover:to-cyan-100 transition-colors">
+                  <f.icon className="w-6 h-6 text-sky-600" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-800 mb-2 font-[Poppins,sans-serif]">
+                  {f.title}
+                </h3>
+                <p className="text-sm text-slate-500 leading-relaxed">
+                  {f.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ══════════════════════ HOW IT WORKS (coming next) ══════════════════════ */}
 
