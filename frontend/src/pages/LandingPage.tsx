@@ -431,7 +431,89 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ══════════════════════ TESTIMONIALS (coming next) ══════════════════════ */}
+      {/* ══════════════════════ TESTIMONIALS ══════════════════════ */}
+      <section id="testimonials" className="py-20 lg:py-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div {...motionProps} variants={fadeUp} className="text-center max-w-2xl mx-auto mb-16">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs font-semibold mb-4 tracking-wide">
+              Testimonials
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-[Poppins,sans-serif] tracking-tight">
+              Loved by{" "}
+              <span className="bg-linear-to-r from-sky-500 to-cyan-500 bg-clip-text text-transparent">
+                Students
+              </span>{" "}
+              Everywhere
+            </h2>
+            <p className="mt-4 text-lg text-slate-500 leading-relaxed">
+              See what our community has to say about their FlowLearn experience.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+            {[
+              {
+                name: "Sarah Chen",
+                role: "Medical Student",
+                avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face",
+                content: "FlowLearn cut my study time in half. The AI-generated quizzes are incredibly accurate and the spaced repetition keeps everything fresh in my memory.",
+                rating: 5,
+              },
+              {
+                name: "Marcus Johnson",
+                role: "Software Engineer",
+                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+                content: "I use FlowLearn to stay up-to-date with new technologies. The document-to-flashcard pipeline is seamless and saves me hours every week.",
+                rating: 5,
+              },
+              {
+                name: "Emily Nakamura",
+                role: "Law Student",
+                avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
+                content: "The analytics dashboard helps me identify weak areas instantly. My exam scores improved by 30% within the first month of using FlowLearn.",
+                rating: 5,
+              },
+            ].map((t, i) => (
+              <motion.div
+                key={t.name}
+                {...motionProps}
+                variants={scaleIn}
+                custom={i}
+                className="p-7 rounded-3xl bg-white border border-slate-100 hover:border-sky-200 shadow-sm hover:shadow-xl hover:shadow-sky-500/5 transition-all duration-300"
+              >
+                {/* Stars */}
+                <div className="flex gap-1 mb-4">
+                  {Array.from({ length: t.rating }).map((_, idx) => (
+                    <Star
+                      key={idx}
+                      className="w-4 h-4 fill-amber-400 text-amber-400"
+                    />
+                  ))}
+                </div>
+
+                <p className="text-slate-600 leading-relaxed mb-6 text-sm">
+                  "{t.content}"
+                </p>
+
+                <div className="flex items-center gap-3">
+                  <img
+                    src={t.avatar}
+                    alt={t.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                    loading="lazy"
+                  />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800">
+                      {t.name}
+                    </p>
+                    <p className="text-xs text-slate-400">{t.role}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ══════════════════════ PRICING (coming next) ══════════════════════ */}
 
