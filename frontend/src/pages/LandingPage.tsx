@@ -372,7 +372,64 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ══════════════════════ HOW IT WORKS (coming next) ══════════════════════ */}
+      {/* ══════════════════════ HOW IT WORKS ══════════════════════ */}
+      <section
+        id="how-it-works"
+        className="py-20 lg:py-28 bg-linear-to-b from-slate-50 to-white"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div {...motionProps} variants={fadeUp} className="text-center max-w-2xl mx-auto mb-16">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs font-semibold mb-4 tracking-wide">
+              How It Works
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-[Poppins,sans-serif] tracking-tight">
+              From Documents to{" "}
+              <span className="bg-linear-to-r from-sky-500 to-cyan-500 bg-clip-text text-transparent">
+                Mastery
+              </span>
+            </h2>
+            <p className="mt-4 text-lg text-slate-500 leading-relaxed">
+              Four simple steps to transform your learning experience.
+            </p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { icon: Upload, title: "Upload Documents", description: "Upload your PDF or DOCX files to FlowLearn." },
+              { icon: Cpu, title: "AI Processes Content", description: "Our AI analyzes your materials and creates study resources automatically." },
+              { icon: GraduationCap, title: "Study Interactively", description: "Learn with quizzes, flashcards, and guided study sessions." },
+              { icon: TrendingUp, title: "Track & Improve", description: "Monitor progress, maintain streaks, and achieve your learning goals." },
+            ].map((step, i) => (
+              <motion.div
+                key={step.title}
+                {...motionProps}
+                variants={fadeUp}
+                custom={i}
+                className="relative text-center"
+              >
+                {/* Connector line */}
+                {i < 3 && (
+                  <div className="hidden lg:block absolute top-10 left-[60%] w-[80%] h-px bg-linear-to-r from-sky-300 to-sky-100" />
+                )}
+
+                <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-linear-to-br from-sky-500 to-cyan-400 shadow-xl shadow-sky-500/20 mb-6">
+                  <step.icon className="w-8 h-8 text-white" />
+                  <span className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-white border-2 border-sky-200 text-xs font-bold text-sky-700 flex items-center justify-center shadow">
+                    {i + 1}
+                  </span>
+                </div>
+
+                <h3 className="text-lg font-bold text-slate-800 mb-2 font-[Poppins,sans-serif]">
+                  {step.title}
+                </h3>
+                <p className="text-sm text-slate-500 leading-relaxed max-w-xs mx-auto">
+                  {step.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ══════════════════════ TESTIMONIALS (coming next) ══════════════════════ */}
 
