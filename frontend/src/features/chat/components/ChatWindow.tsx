@@ -14,7 +14,6 @@ import {
   Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChatMessage } from './ChatMessage';
 import type { Message } from '../types';
 
@@ -42,12 +41,15 @@ export const ChatWindow = ({
   onToggleExpand,
 }: ChatWindowProps) => {
   const [input, setInput] = useState('');
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-scroll xuống đáy khi có tin nhắn mới
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    }
   }, [messages, isLoading]);
 
   // Focus input khi mở
@@ -76,7 +78,7 @@ export const ChatWindow = ({
       )}
     >
       {/* ── Header ──────────────────────────────────────────── */}
-      <div className="flex items-center justify-between px-4 py-3 bg-linear-to-r from-ocean-600 to-ocean-500">
+      <div className="flex items-center justify-between px-4 py-3 bg-linear-to-r from-ocean-600 to-ocean-500 shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="flex items-center justify-center size-8 rounded-full bg-white/20 backdrop-blur-sm">
             <Bot className="size-4.5 text-white" />
@@ -126,7 +128,19 @@ export const ChatWindow = ({
       </div>
 
       {/* ── Body (Khu vực tin nhắn) ─────────────────────────── */}
-      <ScrollArea className="flex-1">
+      <div
+        ref={scrollContainerRef}
+        className={cn(
+          'flex-1 min-h-0 overflow-y-auto overscroll-contain',
+          // Custom scrollbar
+          'scrollbar-thin scrollbar-track-transparent scrollbar-thumb-slate-200',
+          'hover:scrollbar-thumb-slate-300',
+          '[&::-webkit-scrollbar]:w-1.5',
+          '[&::-webkit-scrollbar-track]:bg-transparent',
+          '[&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full',
+          '[&:hover::-webkit-scrollbar-thumb]:bg-slate-300',
+        )}
+      >
         <div className="p-4">
           {/* Tin nhắn chào mừng mặc định */}
           {messages.length === 0 && !isLoading && (
@@ -172,12 +186,12 @@ export const ChatWindow = ({
           )}
 
           {/* Anchor để auto-scroll */}
-          <div ref={bottomRef} />
+          <div />
         </div>
-      </ScrollArea>
+      </div>
 
       {/* ── Footer (Khu vực nhập liệu) ─────────────────────── */}
-      <div className="border-t border-slate-100 p-3">
+      <div className="border-t border-slate-100 p-3 shrink-0">
         <div className="flex items-end gap-2">
           <textarea
             ref={inputRef}
