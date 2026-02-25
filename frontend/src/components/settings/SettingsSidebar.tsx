@@ -28,8 +28,9 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
             <li key={it.key}>
               <button
                 onClick={() => onChange?.(it.key)}
+                aria-current={isActive ? 'true' : undefined}
                 className={cn(
-                  'flex items-center gap-3 w-full text-left px-4 py-3 rounded-2xl transition-colors',
+                  'flex items-center gap-3 w-full text-left px-4 py-3 rounded-2xl transition-colors focus:outline-none focus:ring-2 focus:ring-ocean-300',
                   isActive
                     ? 'bg-ocean-50 text-ocean-700 shadow-sm'
                     : 'text-slate-600 hover:bg-slate-50'
