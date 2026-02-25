@@ -2,12 +2,18 @@ import { AuthLayout } from '@/layouts/AuthLayout'
 import { MainLayout } from '@/layouts/MainLayout'
 import { ProtectedRoute } from '@/layouts/ProtectedRoute'
 import FolderDetailsPage from '@/pages/FolderDetailsPage'
+import LandingPage from '@/pages/LandingPage'
 import LoginPage from '@/pages/LoginPage'
 import { OverviewPage } from '@/pages/OverviewPage'
 import RegisterPage from '@/pages/RegisterPage'
 import { StudyFolderPage } from '@/pages/StudyFolderPage'
 import {createBrowserRouter} from 'react-router-dom'
 export const router = createBrowserRouter([
+    // Landing Page (public)
+    {
+        path: '/landing',
+        element: <LandingPage />,
+    },
     //Auth
     {
         element: <AuthLayout/>,
