@@ -1,8 +1,8 @@
 import React from "react";
 import type { Feedback } from "../types";
-import { Card } from "../../../../components/ui/card";
-import { Badge } from "../../../../components/ui/badge";
-import { Button } from "../../../../components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface FeedbackViewProps {
   feedback: Feedback;

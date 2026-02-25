@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import type { QuizQuestion } from "../types";
-import { Button } from "../../../../components/ui/button";
-import { Card } from "../../../../components/ui/card";
-import { Progress } from "../../../../components/ui/progress";
-import { Badge } from "../../../../components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 
 interface QuizViewProps {
   questions: QuizQuestion[];
