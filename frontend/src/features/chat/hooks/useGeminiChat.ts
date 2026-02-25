@@ -50,7 +50,7 @@ export const useGeminiChat = () => {
     if (!chatSessionRef.current) {
       const genAI = getGeminiClient();
       const model = genAI.getGenerativeModel({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-2.5-flash',
         systemInstruction: SYSTEM_INSTRUCTION,
       });
       chatSessionRef.current = model.startChat({

@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { ChatWidget } from '@/features/chat/components/ChatWidget';
 
 export const MainLayout = () => {
   return (
@@ -17,6 +18,9 @@ export const MainLayout = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Chat Widget – FAB cố định góc dưới phải */}
+      <ChatWidget />
     </div>
   );
 };
