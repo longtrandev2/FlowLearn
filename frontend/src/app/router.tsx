@@ -7,6 +7,7 @@ import { OverviewPage } from '@/pages/OverviewPage'
 import RegisterPage from '@/pages/RegisterPage'
 import LibraryPage from '@/pages/LibraryPage'
 import StudyPage from '@/pages/StudyPage'
+import SettingsPage from '@/pages/SettingsPage'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 
 export const router = createBrowserRouter([
@@ -36,6 +37,17 @@ export const router = createBrowserRouter([
                     { path: 'library/:folderId', element: <LibraryPage /> },
                     { path: 'study', element: <StudyPage /> },
                 ],
+            },
+        ],
+    },
+    // Ensure /settings route renders inside MainLayout when protected
+    {
+        path: '/settings',
+        element: <ProtectedRoute />,
+        children: [
+            {
+                element: <MainLayout />,
+                children: [{ index: true, element: <SettingsPage /> }],
             },
         ],
     },

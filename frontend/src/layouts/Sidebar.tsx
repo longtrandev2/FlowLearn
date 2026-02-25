@@ -30,7 +30,7 @@ export const Sidebar = () => {
         </div>
         <NavItem to="/" icon={<LayoutDashboard size={19} />} label="Overview" />
         <NavItem to="/library" icon={<Layers size={19} />} label="Library" />
-        <NavItem to="/setting" icon={<Cog size={19} />} label="Setting" />
+        <NavItem to="/settings" icon={<Cog size={19} />} label="Setting" />
       </div>
 
       {/* ── Logout ── */}
