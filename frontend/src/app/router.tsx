@@ -6,6 +6,7 @@ import LoginPage from '@/pages/LoginPage'
 import { OverviewPage } from '@/pages/OverviewPage'
 import RegisterPage from '@/pages/RegisterPage'
 import LibraryPage from '@/pages/LibraryPage'
+import StudyPage from '@/pages/StudyPage'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 
 export const router = createBrowserRouter([
@@ -33,6 +34,7 @@ export const router = createBrowserRouter([
                     { index: true, element: <OverviewPage /> },
                     { path: 'library', element: <LibraryPage /> },
                     { path: 'library/:folderId', element: <LibraryPage /> },
+                    { path: 'study', element: <StudyPage /> },
                 ],
             },
         ],
