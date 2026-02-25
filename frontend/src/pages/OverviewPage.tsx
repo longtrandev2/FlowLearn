@@ -1,23 +1,26 @@
-
-import RecentDocuments from '@/features/overview/components/RecentDocuments';
-import StudyChart from '@/features/overview/components/StudyChart';
-import StreakCard from '@/features/overview/components/StreakCard';
-import RealtimeClock from '@/features/overview/components/RealtimeClock';
+import ContinueLearning from '@/features/overview/components/ContinueLearning';
+import StudyTimeChart from '@/features/overview/components/StudyTimeChart';
+import StreakCard from '@/features/overview/components/StreakCardNew';
+import TodayWidget from '@/features/overview/components/TodayWidget';
 
 export const OverviewPage = () => {
   return (
-    <div className="p-6 space-y-8 max-w-7xl mx-auto">
-      <RecentDocuments />
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
-        <div className="lg:col-span-2 h-full">
-          <StudyChart />
+    <div className="h-full grid grid-rows-[auto_1fr_auto] gap-4 overflow-hidden">
+      {/* Row 1: Continue Learning – auto height, horizontal cards */}
+      <ContinueLearning />
+
+      {/* Row 2: Chart (2/3) + Streak (1/3) – fills remaining space */}
+      <section className="grid grid-cols-3 gap-4 min-h-0">
+        <div className="col-span-2 min-h-0">
+          <StudyTimeChart />
         </div>
-        <div className="h-full">
+        <div className="col-span-1 min-h-0">
           <StreakCard />
         </div>
       </section>
-      <RealtimeClock />
 
+      {/* Row 3: Today bar – slim bottom strip */}
+      <TodayWidget />
     </div>
   );
-}
+};
