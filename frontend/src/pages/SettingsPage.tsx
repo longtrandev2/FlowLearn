@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SettingsSidebar, { type SettingsTab } from '@/components/settings/SettingsSidebar';
 import ProfileSection from '@/components/settings/sections/ProfileSection';
+import BillingSection from '@/components/settings/sections/BillingSection';
 
 const SettingsPage: React.FC = () => {
   const [active, setActive] = useState<SettingsTab>('profile');
@@ -22,7 +23,7 @@ const SettingsPage: React.FC = () => {
           <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 min-h-[360px]">
             {/* Placeholder – sections will be inserted here in later steps */}
             {active === 'profile' && <ProfileSection />}
-            {active === 'billing' && <div className="text-slate-600">Billing & Storage section will appear here.</div>}
+            {active === 'billing' && <BillingSection />}
             {active === 'notifications' && <div className="text-slate-600">Notification settings will appear here.</div>}
           </div>
         </main>
