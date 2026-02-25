@@ -1,41 +1,44 @@
 import { AuthLayout } from '@/layouts/AuthLayout'
 import { MainLayout } from '@/layouts/MainLayout'
 import { ProtectedRoute } from '@/layouts/ProtectedRoute'
-import FolderDetailsPage from '@/pages/FolderDetailsPage'
 import LandingPage from '@/pages/LandingPage'
 import LoginPage from '@/pages/LoginPage'
 import { OverviewPage } from '@/pages/OverviewPage'
 import RegisterPage from '@/pages/RegisterPage'
-import { StudyFolderPage } from '@/pages/StudyFolderPage'
-import {createBrowserRouter} from 'react-router-dom'
+import LibraryPage from '@/pages/LibraryPage'
+import StudyPage from '@/pages/StudyPage'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
+
 export const router = createBrowserRouter([
     // Landing Page (public)
     {
         path: '/landing',
         element: <LandingPage />,
     },
-    //Auth
+    // Auth
     {
-        element: <AuthLayout/>,
-        children:[
-            {path: '/login', element:<LoginPage/>},
-            {path: '/register', element: <RegisterPage/>}
-        ]
+        element: <AuthLayout />,
+        children: [
+            { path: '/login', element: <LoginPage /> },
+            { path: '/register', element: <RegisterPage /> },
+        ],
     },
+    // Protected
     {
-        element: <ProtectedRoute/>,
+        element: <ProtectedRoute />,
         children: [
             {
-                path:'/',
-                element: <MainLayout/>,
+                path: '/',
+                element: <MainLayout />,
                 children: [
-                    {index : true,  element:<OverviewPage/>},
-                    {path : '/study-folder',  element:<StudyFolderPage/>},
-                    { path: 'study-folder/:id', element: <FolderDetailsPage /> },
-                    {index : true,  element:<OverviewPage/>}
-                ]
-            }
-        ]
-    }
-    
+                    { index: true, element: <OverviewPage /> },
+                    { path: 'library', element: <LibraryPage /> },
+                    { path: 'library/:folderId', element: <LibraryPage /> },
+                    { path: 'study', element: <StudyPage /> },
+                ],
+            },
+        ],
+    },
+    // Fallback
+    { path: '*', element: <Navigate to="/landing" replace /> },
 ])
