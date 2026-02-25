@@ -14,10 +14,10 @@ export const Sidebar = () => {
       {/* ── Logo ── */}
       <div className="h-16 flex items-center px-6 border-b border-ocean-50 shrink-0">
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center text-white shadow-md group-hover:scale-110 transition-transform duration-200">
+          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-ocean-400 to-ocean-600 flex items-center justify-center text-white shadow-md group-hover:scale-110 transition-transform duration-200">
             <Droplets size={18} fill="currentColor" />
           </div>
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-ocean-600 to-ocean-800">
+          <span className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-ocean-600 to-ocean-800">
             FlowLearn
           </span>
         </Link>
@@ -29,7 +29,7 @@ export const Sidebar = () => {
           Menu
         </div>
         <NavItem to="/" icon={<LayoutDashboard size={19} />} label="Overview" />
-        <NavItem to="/study-folder" icon={<Layers size={19} />} label="Study" />
+        <NavItem to="/library" icon={<Layers size={19} />} label="Library" />
         <NavItem to="/setting" icon={<Cog size={19} />} label="Setting" />
       </div>
 
