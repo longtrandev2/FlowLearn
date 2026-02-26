@@ -20,11 +20,11 @@ const data = [
 
 export const ActivityChart = () => {
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+    <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 h-[400px] w-full">
       <h2 className="text-lg font-semibold text-slate-700 mb-4">
         Weekly Activity
       </h2>
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />

@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AdminUser } from "../types";
+import type { AdminUser } from "../types/index";
 import { UserActions } from "./UserActions";
 
 interface UsersTableProps {

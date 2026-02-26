@@ -8,7 +8,10 @@ import RegisterPage from '@/pages/RegisterPage'
 import LibraryPage from '@/pages/LibraryPage'
 import StudyPage from '@/pages/StudyPage'
 import SettingsPage from '@/pages/SettingsPage'
+import AdminDashboard from '@/pages/AdminDashboard'
+import AdminLoginPage from '@/pages/AdminLoginPage'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { AdminLayout } from '@/features/admin/layouts/AdminLayout'
 
 export const router = createBrowserRouter([
     // Landing Page (public)
@@ -24,7 +27,7 @@ export const router = createBrowserRouter([
             { path: '/register', element: <RegisterPage /> },
         ],
     },
-    // Protected
+    // User Protected Routes
     {
         element: <ProtectedRoute />,
         children: [
@@ -40,7 +43,23 @@ export const router = createBrowserRouter([
             },
         ],
     },
-    // Ensure /settings route renders inside MainLayout when protected
+    // Admin Routes
+    {
+        path: '/admin',
+        children: [
+            { path: 'login', element: <AdminLoginPage /> },
+            {
+                element: <ProtectedRoute />,
+                children: [
+                    {
+                        element: <AdminLayout />,
+                        children: [{ index: true, element: <AdminDashboard /> }],
+                    },
+                ],
+            },
+        ],
+    },
+    // Settings Route
     {
         path: '/settings',
         element: <ProtectedRoute />,
