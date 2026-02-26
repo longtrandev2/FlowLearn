@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { AdminUser } from "../types";
+import { UserActions } from "./UserActions";
 
 interface UsersTableProps {
   users: AdminUser[];
@@ -54,17 +55,10 @@ export const UsersTable = ({ users }: UsersTableProps) => {
               </td>
               <td className="p-3 text-sm text-slate-700">{user.totalFiles}</td>
               <td className="p-3 text-sm text-slate-700">
-                <Badge
-                  className={
-                    user.status === "Active"
-                      ? "bg-green-500 text-white"
-                      : user.status === "Warned"
-                      ? "bg-yellow-500 text-white"
-                      : "bg-red-500 text-white"
-                  }
-                >
-                  {user.status}
-                </Badge>
+                <UserActions
+                  onWarn={(reason) => console.log(`Warned ${user.name}: ${reason}`)}
+                  onBan={(reason) => console.log(`Banned ${user.name}: ${reason}`)}
+                />
               </td>
             </tr>
           ))}
