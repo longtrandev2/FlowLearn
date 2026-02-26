@@ -12,6 +12,8 @@ import AdminDashboard from '@/pages/AdminDashboard'
 import AdminLoginPage from '@/pages/AdminLoginPage'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AdminLayout } from '@/features/admin/layouts/AdminLayout'
+import AdminDashboardPage from '@/pages/admin/AdminDashboardPage'
+import AdminUsersPage from '@/pages/admin/AdminUsersPage'
 
 export const router = createBrowserRouter([
     // Landing Page (public)
@@ -46,17 +48,10 @@ export const router = createBrowserRouter([
     // Admin Routes
     {
         path: '/admin',
+        element: <AdminLayout />,
         children: [
-            { path: 'login', element: <AdminLoginPage /> },
-            {
-                element: <ProtectedRoute />,
-                children: [
-                    {
-                        element: <AdminLayout />,
-                        children: [{ index: true, element: <AdminDashboard /> }],
-                    },
-                ],
-            },
+            { index: true, element: <AdminDashboardPage /> },
+            { path: 'users', element: <AdminUsersPage /> },
         ],
     },
     // Settings Route
