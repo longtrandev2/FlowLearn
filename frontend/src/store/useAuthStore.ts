@@ -18,7 +18,7 @@ type AuthState = {
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
-  isAuthenticated: false,
+  isAuthenticated: localStorage.getItem("isAuthenticated") === "true", // Rehydrate from localStorage
   user: null,
   isLoading: false,
 
@@ -37,6 +37,7 @@ export const useAuthStore = create<AuthState>((set) => ({
           email: email, 
         } 
       });
+      localStorage.setItem("isAuthenticated", "true");
     } else {
       set({ isLoading: false });
       alert('Wrong mail or password!');
@@ -52,7 +53,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       isAuthenticated: true,
       user: { id: '2', userName , email }
     }); 
+    localStorage.setItem("isAuthenticated", "true");
   },
 
-  logout: () => set({ isAuthenticated: false, user: null }),
+  logout: () => {
+    set({ isAuthenticated: false, user: null });
+    localStorage.removeItem("isAuthenticated");
+  },
 }));
