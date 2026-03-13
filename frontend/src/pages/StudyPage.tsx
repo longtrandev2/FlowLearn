@@ -43,7 +43,7 @@ const StudyPage: React.FC = () => {
         {!selectedGoal ? (
           <GoalSelector
             goals={LEARNING_GOALS}
-            selectedGoal={null}
+            selectedGoal={null} 
             onSelect={handleSelectGoal}
           />
         ) : (
