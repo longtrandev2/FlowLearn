@@ -14,12 +14,18 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AdminLayout } from '@/features/admin/layouts/AdminLayout'
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage'
 import AdminUsersPage from '@/pages/admin/AdminUsersPage'
+import { MSWTestPage } from '@/pages/MSWTestPage'
 
 export const router = createBrowserRouter([
     // Landing Page (public)
     {
         path: '/landing',
         element: <LandingPage />,
+    },
+    // MSW Test Page (dev only)
+    {
+        path: '/msw-test',
+        element: <MSWTestPage />,
     },
     // Auth
     {
@@ -48,10 +54,20 @@ export const router = createBrowserRouter([
     // Admin Routes
     {
         path: '/admin',
-        element: <AdminLayout />,
         children: [
-            { index: true, element: <AdminDashboardPage /> },
-            { path: 'users', element: <AdminUsersPage /> },
+            { path: 'login', element: <AdminLoginPage /> },
+            {
+                element: <ProtectedRoute />,
+                children: [
+                    {
+                        element: <AdminLayout />,
+                        children: [
+                            { index: true, element: <AdminDashboardPage /> },
+                            { path: 'users', element: <AdminUsersPage /> },
+                        ],
+                    },
+                ],
+            },
         ],
     },
     // Settings Route

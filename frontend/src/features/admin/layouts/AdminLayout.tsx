@@ -1,11 +1,12 @@
-import { Sidebar } from "@/layouts/Sidebar";
+import { Outlet } from "react-router-dom";
+import { AdminSidebar } from "@/components/admin/AdminSidebar";
 
-export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
+export const AdminLayout = () => {
   return (
     <div className="flex h-screen w-screen">
       {/* Sidebar */}
       <div className="w-64 shrink-0">
-        <Sidebar />
+        <AdminSidebar />
       </div>
 
       {/* Main Content */}
@@ -16,7 +17,9 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         </header>
 
         {/* Page Content */}
-        <main className="p-6">{children}</main>
+        <main className="p-6">
+          <Outlet />
+        </main>
       </div>
     </div>
   );
