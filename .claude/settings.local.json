@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find \"D:\\\\Project\\\\FlowLearn\\\\frontend\\\\src\" -name \"*api*\" -o -name \"*query*\" -o -name \"*axios*\" 2>/dev/null | head -20)"
+    ,"mcp__playwright"
+    ]
+  }
+}
