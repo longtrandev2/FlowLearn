@@ -10,7 +10,15 @@ import com.example.backend.repository.FlashcardRepository;
 import com.example.backend.repository.StudySessionRepository;
 import com.example.backend.repository.UserFlashcardProgressRepository;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.entity.Document;
+import com.example.backend.entity.StudySession;
+import com.example.backend.repository.DocumentRepository;
+import com.example.backend.service.ai.AiGenerationService;
+import com.example.backend.service.file.FileStorageService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -23,6 +31,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FlashcardServiceImpl implements FlashcardService {
@@ -31,6 +40,10 @@ public class FlashcardServiceImpl implements FlashcardService {
     private final UserFlashcardProgressRepository progressRepository;
     private final StudySessionRepository studySessionRepository;
     private final UserRepository userRepository;
+    private final DocumentRepository documentRepository;
+    private final AiGenerationService aiGenerationService;
+    private final FileStorageService fileStorageService;
+    private final ObjectMapper objectMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -113,6 +126,79 @@ public class FlashcardServiceImpl implements FlashcardService {
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new AccessDeniedException("User not found"));
+    }
+
+    @Override
+    @Transactional
+    public java.util.List<FlashcardDto> getOrGenerateFlashcards(String userEmail, String sessionId) {
+        User user = getUserByEmail(userEmail);
+        StudySession session = studySessionRepository.findByIdAndUserId(sessionId, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Session not found or access denied"));
+
+        java.util.List<Flashcard> existingFlashcards = flashcardRepository.findByStudySessionId(sessionId, Pageable.unpaged()).getContent();
+        if (!existingFlashcards.isEmpty()) {
+            return existingFlashcards.stream().map(this::mapToFlashcardDto).toList();
+        }
+
+        // Generate them
+        String text = getSessionTextContent(session);
+        String jsonContent = aiGenerationService.generateFlashcards(session, text, 10); // generating 10 cards
+        
+        // Parse and save
+        try {
+            // Might have markdown block `json ... `, so strip it if necessary.
+            jsonContent = extractJson(jsonContent);
+            java.util.List<java.util.Map<String, String>> cardsParsed = objectMapper.readValue(
+                    jsonContent, new TypeReference<java.util.List<java.util.Map<String, String>>>() {}
+            );
+
+            java.util.List<Flashcard> newFlashcards = new java.util.ArrayList<>();
+            for (java.util.Map<String, String> cardMap : cardsParsed) {
+                Flashcard fc = Flashcard.builder()
+                        .id(UUID.randomUUID().toString())
+                        .documentId(session.getScopeId()) // Only exact for FILE scope
+                        .studySessionId(sessionId)
+                        .front(cardMap.get("front"))
+                        .back(cardMap.get("back"))
+                        .importance(com.example.backend.enums.FlashcardImportance.CORE) // default
+                        .createdAt(LocalDateTime.now())
+                        .build();
+                newFlashcards.add(flashcardRepository.save(fc));
+            }
+            return newFlashcards.stream().map(this::mapToFlashcardDto).toList();
+            
+        } catch (Exception e) {
+            log.error("Failed to parse and save generated flashcards: {}", jsonContent, e);
+            throw new RuntimeException("Could not generate flashcards format properly", e);
+        }
+    }
+
+    private String getSessionTextContent(StudySession session) {
+        if (session.getScope() == com.example.backend.enums.StudyScope.FILE) {
+            Document doc = documentRepository.findById(session.getScopeId())
+                    .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+            try {
+                return fileStorageService.downloadText(doc.getR2Key() + ".txt");
+            } catch (Exception e) {
+                log.error("Failed to fetch text content for document {}", doc.getId(), e);
+                return "Note: Content could not be extracted or is missing.";
+            }
+        }
+        return "";
+    }
+    
+    private String extractJson(String raw) {
+        if (raw == null) return "[]";
+        String trimmed = raw.trim();
+        if (trimmed.startsWith("```json")) {
+            trimmed = trimmed.substring("```json".length());
+        } else if (trimmed.startsWith("```")) {
+            trimmed = trimmed.substring("```".length());
+        }
+        if (trimmed.endsWith("```")) {
+            trimmed = trimmed.substring(0, trimmed.length() - 3);
+        }
+        return trimmed.trim();
     }
 
     private FlashcardDto mapToFlashcardDto(Flashcard entity) {

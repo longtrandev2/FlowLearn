@@ -10,4 +10,11 @@ public interface StudySessionService {
     StudySessionDto getSession(String userEmail, String sessionId);
     StudySessionDto endSession(String userEmail, String sessionId);
     Page<StudySessionDto> getUserSessions(String userEmail, Pageable pageable);
+    
+    // AI Generation methods
+    com.example.backend.dto.study.SummaryDto getSessionSummary(String userEmail, String sessionId, String goalIdStr);
+    
+    java.util.List<com.example.backend.dto.study.FlashcardDto> getSessionFlashcards(String userEmail, String sessionId);
+    
+    com.example.backend.dto.study.QuizDto getSessionQuiz(String userEmail, String sessionId, String cognitiveLevel);
 }
