@@ -19,9 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/flashcards")
 @RequiredArgsConstructor
@@ -29,7 +26,7 @@ public class FlashcardController {
 
     private final FlashcardService flashcardService;
 
-    @GetMapping("/document/{documentId}")
+    @GetMapping("/session/{sessionId}")
     public ResponseEntity<ApiResponse<Page<FlashcardDto>>> getBySession(
             Authentication authentication,
             @PathVariable String sessionId,
