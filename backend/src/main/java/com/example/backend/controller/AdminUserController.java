@@ -1,7 +1,10 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.UserDto;
-import com.example.backend.dto.UpdateUserRequest;
+import com.example.backend.dto.UpdateRoleRequest;
+import com.example.backend.dto.UpdatePlanRequest;
+import com.example.backend.entity.UserRole;
+import com.example.backend.entity.UserStatus;
 import com.example.backend.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,8 +20,12 @@ public class AdminUserController {
     private final AdminUserService adminUserService;
 
     @GetMapping
-    public ResponseEntity<Page<UserDto>> getAllUsers(Pageable pageable) {
-        return ResponseEntity.ok(adminUserService.getAllUsers(pageable));
+    public ResponseEntity<Page<UserDto>> getAllUsers(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) UserRole role,
+            @RequestParam(required = false) UserStatus status,
+            Pageable pageable) {
+        return ResponseEntity.ok(adminUserService.getAllUsers(search, role, status, pageable));
     }
 
     @GetMapping("/{id}")
@@ -26,12 +33,40 @@ public class AdminUserController {
         return ResponseEntity.ok(adminUserService.getUserById(id));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(
+    @PutMapping("/{id}/role")
+    public ResponseEntity<UserDto> updateRole(
             @PathVariable String id,
-            @RequestBody UpdateUserRequest request
+            @RequestBody UpdateRoleRequest request
     ) {
-        return ResponseEntity.ok(adminUserService.updateUser(id, request));
+        return ResponseEntity.ok(adminUserService.updateRole(id, request));
+    }
+
+    @PostMapping("/{id}/warn")
+    public ResponseEntity<UserDto> warnUser(@PathVariable String id) {
+        return ResponseEntity.ok(adminUserService.warnUser(id));
+    }
+
+    @PostMapping("/{id}/ban")
+    public ResponseEntity<UserDto> banUser(@PathVariable String id) {
+        return ResponseEntity.ok(adminUserService.banUser(id));
+    }
+
+    @PostMapping("/{id}/unban")
+    public ResponseEntity<UserDto> unbanUser(@PathVariable String id) {
+        return ResponseEntity.ok(adminUserService.unbanUser(id));
+    }
+
+    @PostMapping("/{id}/suspend")
+    public ResponseEntity<UserDto> suspendUser(@PathVariable String id) {
+        return ResponseEntity.ok(adminUserService.suspendUser(id));
+    }
+
+    @PutMapping("/{id}/plan")
+    public ResponseEntity<UserDto> updatePlan(
+            @PathVariable String id,
+            @RequestBody UpdatePlanRequest request
+    ) {
+        return ResponseEntity.ok(adminUserService.updatePlan(id, request));
     }
 
     @DeleteMapping("/{id}")
