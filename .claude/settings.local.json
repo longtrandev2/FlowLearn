@@ -1,8 +1,70 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find \"D:\\\\Project\\\\FlowLearn\\\\frontend\\\\src\" -name \"*api*\" -o -name \"*query*\" -o -name \"*axios*\" 2>/dev/null | head -20)"
-    ,"mcp__playwright"
+      "Bash(find \"D:\\\\Project\\\\FlowLearn\\\\frontend\\\\src\" -name \"*api*\" -o -name \"*query*\" -o -name \"*axios*\" 2>/dev/null | head -20)",
+      "mcp__playwright",
+      "Bash(for dir:*)",
+      "Bash(do echo:*)",
+      "Read(//d/Project/FlowLearn/backend/src/main/java/com/example/backend/**)",
+      "Bash(done)",
+      "Bash(find /d/Project/FlowLearn -name *API* -o -name *api* -o -name *spec* -o -name *swagger* -o -name *openapi*)"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "true"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $PWD/hooks/query_hook.js",
+            "timeout": 300
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq . > pre-log.json"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_response.filePath // .tool_input.file_path // empty' | xargs -I {} npx --yes prettier --write {} 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "node $PWD/hooks/tsc.js"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq . > post-log.json"
+          }
+        ]
+      }
     ]
   }
 }
