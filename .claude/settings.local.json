@@ -2,12 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(find \"D:\\\\Project\\\\FlowLearn\\\\frontend\\\\src\" -name \"*api*\" -o -name \"*query*\" -o -name \"*axios*\" 2>/dev/null | head -20)",
-      "mcp__playwright",
-      "Bash(for dir:*)",
-      "Bash(do echo:*)",
-      "Read(//d/Project/FlowLearn/backend/src/main/java/com/example/backend/**)",
-      "Bash(done)",
-      "Bash(find /d/Project/FlowLearn -name *API* -o -name *api* -o -name *spec* -o -name *swagger* -o -name *openapi*)"
+      "mcp__playwright"
     ],
     "deny": []
   },
