@@ -66,7 +66,7 @@ public class QuizResult {
 
     @Convert(converter = QuizAnswersConverter.class)
     @Column(nullable = false, columnDefinition = "JSON")
-    private List<Map<String, Object>> answers;
+    private List<com.example.backend.entity.json.QuizAnswerRecord> answers;
 
     @CreatedDate
     @Column(name = "completed_at", nullable = false, updatable = false)

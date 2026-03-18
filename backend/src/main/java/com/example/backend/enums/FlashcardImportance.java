@@ -1,7 +1,8 @@
 package com.example.backend.enums;
 
-import java.util.Arrays;
+import lombok.Getter;
 
+@Getter
 public enum FlashcardImportance {
     CORE("core"),
     SUPPORT("support"),
@@ -9,18 +10,16 @@ public enum FlashcardImportance {
 
     private final String value;
 
-    FlashcardImportance(final String value) {
+    FlashcardImportance(String value) {
         this.value = value;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public static FlashcardImportance fromValue(final String value) {
-        return Arrays.stream(values())
-                .filter(importance -> importance.value.equalsIgnoreCase(value))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown FlashcardImportance value: " + value));
+    public static FlashcardImportance fromValue(String value) {
+        for (FlashcardImportance importance : FlashcardImportance.values()) {
+            if (importance.value.equals(value)) {
+                return importance;
+            }
+        }
+        throw new IllegalArgumentException("Unknown FlashcardImportance value: " + value);
     }
 }
