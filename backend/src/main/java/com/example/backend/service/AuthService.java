@@ -62,6 +62,35 @@ public class AuthService {
         return new AuthResponse(jwtToken);
     }
 
+    public AuthResponse adminLogin(LoginRequest request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.email(),
+                        request.password()
+                )
+        );
+        final var user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        
+        switch (user.getRole()) {
+            case MODERATOR:
+            case SUPER_ADMIN:
+                break;
+            default:
+                throw new org.springframework.security.access.AccessDeniedException("Not an admin account");
+        }
+
+        user.setLastLoginAt(LocalDateTime.now());
+        userRepository.save(user);
+        final UserDetails userDetails = User.builder()
+                .username(user.getEmail())
+                .password(user.getPasswordHash())
+                .authorities("ROLE_" + user.getRole().name())
+                .build();
+        final var jwtToken = jwtService.generateToken(userDetails);
+        return new AuthResponse(jwtToken);
+    }
+
     public CurrentUserResponse getCurrentUser(String email) {
         final var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
