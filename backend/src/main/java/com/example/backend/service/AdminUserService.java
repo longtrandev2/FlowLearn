@@ -106,14 +106,14 @@ public class AdminUserService {
     @Transactional
     public void deleteUser(String id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found");
+            throw new com.example.backend.exception.ResourceNotFoundException("User not found: " + id);
         }
         userRepository.deleteById(id);
     }
 
     private User getUserEntity(String id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id));
+                .orElseThrow(() -> new com.example.backend.exception.ResourceNotFoundException("User not found: " + id));
     }
 
     private UserDto mapToDto(User user) {
