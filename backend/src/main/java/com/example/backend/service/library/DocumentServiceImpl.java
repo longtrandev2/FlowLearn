@@ -7,7 +7,10 @@ import com.example.backend.enums.DocumentStatus;
 import com.example.backend.enums.FileType;
 import com.example.backend.repository.DocumentRepository;
 import com.example.backend.repository.FolderRepository;
+import com.example.backend.service.file.FileParserService;
+import com.example.backend.service.file.FileStorageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,12 +20,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DocumentServiceImpl implements DocumentService {
 
     private final DocumentRepository documentRepository;
     private final FolderRepository folderRepository;
+    private final FileStorageService fileStorageService;
+    private final FileParserService fileParserService;
 
     @Override
     @Transactional
@@ -34,11 +40,32 @@ public class DocumentServiceImpl implements DocumentService {
             folderId = null;
         }
 
-        // Mocking the upload process since there is no actual R2 service right now
-        // Determine file type simply
         FileType type = FileType.PDF;
         if (file.getOriginalFilename() != null && file.getOriginalFilename().toLowerCase().endsWith(".docx")) {
             type = FileType.DOCX;
+        }
+
+        String r2Key = "";
+        String parsedContent = "";
+        DocumentStatus status = DocumentStatus.READY;
+        String errorMessage = null;
+        Integer pageCount = null;
+        
+        try {
+            // 1. Upload to Cloudflare R2
+            r2Key = fileStorageService.uploadFile(file);
+            
+            // 2. Parse text content
+            // Currently, we just parse it. Later it will be sent to Vector DB (Qdrant/Weaviate) for RAG.
+            // For now, if it succeeds without exception, we mark as READY.
+            parsedContent = fileParserService.parseDocument(file);
+            
+            // Optional: calculate rough page count if desired or rely on Tika metadata later
+            // pageCount = ...
+        } catch (Exception e) {
+            log.error("Failed to process document upload", e);
+            status = DocumentStatus.ERROR;
+            errorMessage = e.getMessage();
         }
 
         Document document = Document.builder()
@@ -48,9 +75,11 @@ public class DocumentServiceImpl implements DocumentService {
                 .name(file.getOriginalFilename() != null ? file.getOriginalFilename() : "Untitled")
                 .fileType(type)
                 .fileSizeBytes(file.getSize())
-                .r2Key(UUID.randomUUID().toString() + "-" + file.getOriginalFilename())
-                .r2Bucket("flowlearn-documents")
-                .status(DocumentStatus.PROCESSING)
+                .r2Key(r2Key)
+                .r2Bucket("flowlearn-documents") // Could also inject from environment
+                .status(status)
+                .errorMessage(errorMessage)
+                .pageCount(pageCount)
                 .uploadedAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -105,7 +134,15 @@ public class DocumentServiceImpl implements DocumentService {
         Document document = documentRepository.findByIdAndUserId(documentId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Document not found"));
         
-        // Mock remote delete file from R2 bucket
+        try {
+            if (document.getR2Key() != null && !document.getR2Key().isEmpty()) {
+                fileStorageService.deleteFile(document.getR2Key());
+            }
+        } catch (Exception e) {
+            log.error("Failed to delete file from R2 for document ID: {}", documentId, e);
+            // We can decide whether to throw an exception or just log it and proceed deleting DB record
+        }
+
         documentRepository.delete(document);
     }
 
