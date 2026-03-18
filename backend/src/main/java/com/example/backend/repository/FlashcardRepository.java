@@ -16,4 +16,6 @@ public interface FlashcardRepository extends JpaRepository<Flashcard, String> {
     
     // Find directly by joined study session user
     Optional<Flashcard> findByIdAndStudySessionUserId(String id, String userId);
+
+    long countByStudySessionUserId(String userId);
 }

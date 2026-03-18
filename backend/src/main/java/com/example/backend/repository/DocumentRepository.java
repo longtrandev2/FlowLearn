@@ -23,4 +23,5 @@ public interface DocumentRepository extends JpaRepository<Document, String> {
     Optional<Document> findByIdAndUserId(String id, String userId);
 
     long countByFolderId(String folderId);
+    long countByUserId(String userId);
 }

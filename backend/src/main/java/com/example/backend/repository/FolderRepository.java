@@ -25,4 +25,5 @@ public interface FolderRepository extends JpaRepository<Folder, String> {
     Optional<Folder> findByUserIdAndParentIdIsNullAndName(@Param("userId") String userId, @Param("name") String name);
 
     long countByParentId(String parentId);
+    long countByUserId(String userId);
 }
