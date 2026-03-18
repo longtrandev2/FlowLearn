@@ -21,4 +21,22 @@ public interface FileStorageService {
      * @throws IOException If the deletion fails.
      */
     void deleteFile(String fileUrlOrKey) throws IOException;
+
+    /**
+     * Uploads plain text content as a file to the storage provider.
+     *
+     * @param key The object key to save as.
+     * @param text The text content.
+     * @throws IOException If the upload fails.
+     */
+    void uploadText(String key, String text) throws IOException;
+
+    /**
+     * Downloads text content from the storage provider.
+     *
+     * @param key The object key.
+     * @return The text content.
+     * @throws IOException If the download fails.
+     */
+    String downloadText(String key) throws IOException;
 }

@@ -8,6 +8,8 @@ import com.example.backend.repository.DocumentRepository;
 import com.example.backend.repository.FolderRepository;
 import com.example.backend.repository.StudySessionRepository;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.service.ai.AiGenerationService;
+import com.example.backend.service.study.SummaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,7 @@ public class StudySessionServiceImpl implements StudySessionService {
     private final UserRepository userRepository;
     private final DocumentRepository documentRepository;
     private final FolderRepository folderRepository;
+    private final SummaryService summaryService;
 
     @Override
     @Transactional
@@ -97,6 +100,28 @@ public class StudySessionServiceImpl implements StudySessionService {
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new AccessDeniedException("User not found"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public com.example.backend.dto.study.SummaryDto getSessionSummary(String userEmail, String sessionId, String goalIdStr) {
+        return summaryService.getOrCreateSessionSummary(userEmail, sessionId, goalIdStr);
+    }
+
+    @Override
+    @Transactional
+    public java.util.List<com.example.backend.dto.study.FlashcardDto> getSessionFlashcards(String userEmail, String sessionId) {
+        // Will be wired to FlashcardService generate logic shortly
+        // For now, return empty or implement immediately
+        return new java.util.ArrayList<>();
+    }
+
+    @Override
+    @Transactional
+    public com.example.backend.dto.study.QuizDto getSessionQuiz(String userEmail, String sessionId, String cognitiveLevel) {
+        // Will be wired to QuizService generate logic shortly
+        // For now, return empty or implement immediately
+        return null; // TODO implement
     }
 
     private StudySessionDto mapToDto(StudySession session) {

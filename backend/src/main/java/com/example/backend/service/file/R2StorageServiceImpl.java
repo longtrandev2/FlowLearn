@@ -13,6 +13,11 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.io.IOException;
 import java.util.UUID;
 
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import java.nio.charset.StandardCharsets;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -50,5 +55,32 @@ public class R2StorageServiceImpl implements FileStorageService {
                 .build();
 
         s3Client.deleteObject(deleteObjectRequest);
+    }
+
+    @Override
+    public void uploadText(String key, String text) throws IOException {
+        log.info("Uploading text to Cloudflare R2: {}", key);
+        byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
+
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .contentType("text/plain")
+                .build();
+
+        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
+    }
+
+    @Override
+    public String downloadText(String key) throws IOException {
+        log.info("Downloading text from Cloudflare R2: {}", key);
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+
+        ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(getObjectRequest);
+        return new String(objectBytes.asByteArray(), StandardCharsets.UTF_8);
     }
 }

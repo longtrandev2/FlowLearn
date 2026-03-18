@@ -56,9 +56,12 @@ public class DocumentServiceImpl implements DocumentService {
             r2Key = fileStorageService.uploadFile(file);
             
             // 2. Parse text content
-            // Currently, we just parse it. Later it will be sent to Vector DB (Qdrant/Weaviate) for RAG.
-            // For now, if it succeeds without exception, we mark as READY.
             parsedContent = fileParserService.parseDocument(file);
+            
+            // 3. Save parsed content text to R2 as "{r2Key}.txt"
+            if (parsedContent != null && !parsedContent.isEmpty()) {
+                fileStorageService.uploadText(r2Key + ".txt", parsedContent);
+            }
             
             // Optional: calculate rough page count if desired or rely on Tika metadata later
             // pageCount = ...
@@ -137,6 +140,7 @@ public class DocumentServiceImpl implements DocumentService {
         try {
             if (document.getR2Key() != null && !document.getR2Key().isEmpty()) {
                 fileStorageService.deleteFile(document.getR2Key());
+                fileStorageService.deleteFile(document.getR2Key() + ".txt");
             }
         } catch (Exception e) {
             log.error("Failed to delete file from R2 for document ID: {}", documentId, e);
