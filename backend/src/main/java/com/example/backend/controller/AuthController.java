@@ -36,6 +36,13 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    @PostMapping("/admin/login")
+    public ResponseEntity<AuthResponse> adminLogin(
+            @Valid @RequestBody LoginRequest request
+    ) {
+        return ResponseEntity.ok(authService.adminLogin(request));
+    }
+
     @GetMapping("/me")
     public ResponseEntity<CurrentUserResponse> me(Authentication authentication) {
         final String email = authentication.getName();
