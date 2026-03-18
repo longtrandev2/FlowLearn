@@ -1,7 +1,8 @@
 package com.example.backend.enums;
 
-import java.util.Arrays;
+import lombok.Getter;
 
+@Getter
 public enum GoalId {
     EXAM_PREP("exam-prep"),
     DEEP_UNDERSTANDING("deep-understanding"),
@@ -11,18 +12,16 @@ public enum GoalId {
 
     private final String value;
 
-    GoalId(final String value) {
+    GoalId(String value) {
         this.value = value;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public static GoalId fromValue(final String value) {
-        return Arrays.stream(values())
-                .filter(goal -> goal.value.equalsIgnoreCase(value))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown GoalId value: " + value));
+    public static GoalId fromValue(String value) {
+        for (GoalId goal : GoalId.values()) {
+            if (goal.value.equals(value)) {
+                return goal;
+            }
+        }
+        throw new IllegalArgumentException("Unknown GoalId value: " + value);
     }
 }
