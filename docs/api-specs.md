@@ -2014,6 +2014,63 @@ Content-Type: application/json
 **Error Responses:**
 - `400 BAD_REQUEST` - Invalid signature
 - `422 UNPROCESSABLE_ENTITY` - Invalid event
+---
+
+### 11. Admin User Management APIs
+> **Status:** ?? Frontend Mocked - Backend Implementing
+
+**Total Endpoints:** 9
+
+#### 11.1 List Users
+**Endpoint:** GET /api/v1/admin/users
+**Description:** Get paginated list of users with optional filtering.
+
+**Query Parameters:**
+- page (number, default: 0)
+- size (number, default: 20)
+- search (string, optional) - Search by email or name
+- ole (enum, optional) - USER, MODERATOR, SUPER_ADMIN
+- status (enum, optional) - ACTIVE, WARNED, BANNED, SUSPENDED
+
+#### 11.2 Get User Detail
+**Endpoint:** GET /api/v1/admin/users/{id}
+
+#### 11.3 Update User Role
+**Endpoint:** PUT /api/v1/admin/users/{id}/role
+**Body:**
+`json
+{
+  "role": "MODERATOR"
+}
+`
+
+#### 11.4 Warn User
+**Endpoint:** POST /api/v1/admin/users/{id}/warn
+**Description:** Increments warning_count and sets status to WARNED.
+
+#### 11.5 Ban User
+**Endpoint:** POST /api/v1/admin/users/{id}/ban
+**Description:** Sets user status to BANNED.
+
+#### 11.6 Unban User
+**Endpoint:** POST /api/v1/admin/users/{id}/unban
+**Description:** Restores user status to ACTIVE.
+
+#### 11.7 Suspend User
+**Endpoint:** POST /api/v1/admin/users/{id}/suspend
+**Description:** Sets user status to SUSPENDED.
+
+#### 11.8 Update User Plan
+**Endpoint:** PUT /api/v1/admin/users/{id}/plan
+**Body:**
+`json
+{
+  "plan": "PRO"
+}
+`
+
+#### 11.9 Delete User
+**Endpoint:** DELETE /api/v1/admin/users/{id}
 
 ---
 
