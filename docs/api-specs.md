@@ -3,21 +3,28 @@
 ## Overview
 
 **Base URL:** `https://api.flowlearn.io/api/v1`
+> **⚠️ Implementation Status:** Backend not yet implemented. Frontend currently uses MSW (Mock Service Worker) for development. The base URL above is the planned production URL.
 
 **Version:** v1
 
 **Authentication:** Bearer JWT (JSON Web Token)
+> **⚠️ Implementation Status:** JWT authentication designed but not implemented. Frontend uses mock authentication.
 
 **Content-Type:** `application/json` (except for file upload: `multipart/form-data`)
 
 ### Rate Limiting
 
+> **⚠️ Implementation Status:** Planned feature - not yet implemented
+
+**Planned Implementation:**
 - **Free users:** 100 requests/minute
 - **Pro users:** 1000 requests/minute
 - Rate limit headers included in all responses:
   - `X-RateLimit-Limit`: Request limit per window
   - `X-RateLimit-Remaining`: Remaining requests
   - `X-RateLimit-Reset`: Unix timestamp when limit resets
+
+**Technology:** Redis-based rate limiting (planned)
 
 ### Standard Response Format
 
@@ -77,7 +84,19 @@
 
 ## API Endpoints
 
+### Implementation Status Legend
+
+- 🚧 **Frontend Only** - Frontend UI exists with MSW mock handlers, no backend implementation
+- ✅ **Implemented** - Both frontend and backend working (currently none)
+- 📋 **Planned** - Fully specified but not yet implemented
+- ❌ **Not Started** - No implementation exists
+
+---
+
 ### 1. Authentication APIs
+> **Status:** 🚧 Frontend Only - Mock implementation in MSW handlers
+
+**Total Endpoints:** 8
 
 #### 1.1 Register
 
@@ -362,6 +381,9 @@
 ---
 
 ### 2. Document Management APIs
+> **Status:** 📋 Planned - Fully specified, no implementation
+
+**Total Endpoints:** 6
 
 #### 2.1 Upload Document
 
@@ -487,8 +509,8 @@ Authorization: Bearer <accessToken>
     "type": "PDF",
     "fileSizeBytes": 2516582,
     "size": "2.4 MB",
-    "s3Key": "documents/550e8400-e29b-41d4-a716-446655440000.pdf",
-    "s3Bucket": "flowlearn-documents",
+    "r2Key": "documents/550e8400-e29b-41d4-a716-446655440000.pdf",
+    "r2Bucket": "flowlearn-documents",
     "status": "ready",
     "errorMessage": null,
     "pageCount": 42,
@@ -590,7 +612,7 @@ Content-Type: application/json
 
 **Endpoint:** `DELETE /api/v1/documents/:id`
 
-**Description:** Delete a document (and associated S3 file).
+**Description:** Delete a document (and associated R2 file).
 
 **Headers:**
 ```
@@ -607,6 +629,9 @@ Authorization: Bearer <accessToken>
 ---
 
 ### 3. Folder Management APIs
+> **Status:** 📋 Planned - Frontend types exist, no API calls
+
+**Total Endpoints:** 6
 
 #### 3.1 Create Folder
 
@@ -879,6 +904,9 @@ Authorization: Bearer <accessToken>
 ---
 
 ### 4. Study Session APIs
+> **Status:** 📋 Planned - Frontend pages exist, no API integration
+
+**Total Endpoints:** 6
 
 #### 4.1 Start Study Session
 
@@ -1147,6 +1175,9 @@ Authorization: Bearer <accessToken>
 ---
 
 ### 5. Flashcard & SRS APIs
+> **Status:** 📋 Planned - Frontend types exist, no API calls
+
+**Total Endpoints:** 4
 
 #### 5.1 Get Due Flashcards
 
@@ -1345,6 +1376,9 @@ Authorization: Bearer <accessToken>
 ---
 
 ### 6. Dashboard & Statistics APIs
+> **Status:** 🚧 Frontend Only - Dashboard UI with mock data
+
+**Total Endpoints:** 4
 
 #### 6.1 Get Dashboard Stats
 
@@ -1533,6 +1567,28 @@ Authorization: Bearer <accessToken>
 ---
 
 ### 7. Chat with Documents APIs
+> **Status:** 🔄 **Architecture Change** - Originally designed as backend endpoint, now implemented as direct Gemini API calls from frontend
+
+**Total Endpoints:** 2
+
+**⚠️ Important Implementation Note:**
+The chat functionality is currently implemented differently than originally designed:
+- **Original Design:** Backend RAG system with vector database and streaming responses
+- **Current Implementation:** Frontend makes direct calls to Google Gemini API
+- **Frontend Location:** `frontend/src/features/chat/hooks/useGeminiChat.ts`
+- **API Used:** Google Gemini API (not backend endpoints)
+
+**Why This Approach:**
+- Faster development for MVP
+- No backend infrastructure needed
+- Direct API integration with Gemini
+- Document context passed to Gemini in prompt
+
+**Migration Path:**
+When backend is implemented, can migrate to:
+1. Backend RAG system with vector embeddings (Qdrant/Weaviate)
+2. Server-Sent Events (SSE) for streaming
+3. Better context management with document chunks
 
 #### 7.1 Get Chat Messages
 
@@ -1624,6 +1680,9 @@ data: {"id":"550e8400-e29b-41d4-a716-446655440001","role":"model","content":".",
 ---
 
 ### 8. Quiz APIs
+> **Status:** 📋 Planned - Quiz UI exists, no backend integration
+
+**Total Endpoints:** 4
 
 #### 8.1 Get Quiz
 
@@ -1802,6 +1861,9 @@ Authorization: Bearer <accessToken>
 ---
 
 ### 9. Subscription APIs
+> **Status:** ❌ Not Started - No implementation
+
+**Total Endpoints:** 4
 
 #### 9.1 Get Current Subscription
 
@@ -1987,8 +2049,8 @@ interface Document {
   type: 'PDF' | 'DOCX' | 'TXT' | 'PPTX' | 'XLSX';
   fileSizeBytes: number;
   size: string; // Formatted: "2.4 MB"
-  s3Key: string;
-  s3Bucket: string;
+  r2Key: string;
+  r2Bucket: string;
   status: 'uploading' | 'processing' | 'ready' | 'error';
   errorMessage: string | null;
   pageCount: number | null;
@@ -2118,7 +2180,7 @@ Major version changes will be announced with a migration period.
 3. **Stats Refresh**: Trigger `user_stats` updates on relevant CRUD operations
 4. **SRS Algorithm**: Use SuperMemo-2 (SM-2) algorithm for flashcard scheduling
 5. **AI Integration**: All AI-generated content (summaries, flashcards, quizzes) should handle service unavailability gracefully
-6. **File Upload**: Files stored in AWS S3, database only stores metadata
+6. **File Upload**: Files stored in Cloudflare R2, database only stores metadata
 7. **Nested Folders**: Folder hierarchy is unlimited depth, use recursive queries or adjacency list pattern
 8. **Soft Deletes**: Consider using soft deletes for subscriptions (add `deleted_at` column)
 9. **Webhook Security**: Validate Stripe webhook signatures before processing

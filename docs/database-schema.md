@@ -1,5 +1,23 @@
 # Database Schema Documentation - FlowLearn
 
+> **⚠️ IMPLEMENTATION STATUS: DESIGN PHASE**
+>
+> This database schema documentation represents the **planned design** for the FlowLearn platform. As of the current implementation state:
+>
+> - ✅ Schema design is complete and comprehensive
+> - ❌ No migration files created (no Flyway/Liquibase)
+> - ❌ No JPA entities implemented
+> - ❌ Database not yet deployed
+> - 📋 Ready for implementation when backend development begins
+>
+> **Next Steps:**
+> 1. Create Flyway migration files from this schema
+> 2. Generate JPA entities using the annotations provided
+> 3. Configure database connection in `application.yml`
+> 4. Run migrations to create database tables
+
+---
+
 ## Overview
 
 FlowLearn is a SaaS education platform with AI integration. This database schema is designed for **Spring Boot + MySQL** (MySQL 8.0+) to support:
@@ -73,7 +91,7 @@ FlowLearn is a SaaS education platform with AI integration. This database schema
 | email | VARCHAR(255) | UNIQUE, NOT NULL | User email address |
 | password_hash | VARCHAR(255) | NOT NULL | BCrypt hash |
 | full_name | VARCHAR(255) | NOT NULL | Full display name |
-| avatar_url | VARCHAR(512) | NULL | S3/Cloudinary URL |
+| avatar_url | VARCHAR(512) | NULL | Cloudflare R2/Cloudinary URL |
 | role | ENUM | DEFAULT 'USER' | USER, MODERATOR, SUPER_ADMIN |
 | status | ENUM | DEFAULT 'ACTIVE' | ACTIVE, WARNED, BANNED, SUSPENDED |
 | plan | ENUM | DEFAULT 'FREE' | FREE, PRO |
@@ -234,7 +252,7 @@ public class Folder {
 
 ### 3. documents
 
-**Description:** Stores metadata for uploaded files (actual files stored in AWS S3).
+**Description:** Stores metadata for uploaded files (actual files stored in Cloudflare R2).
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
@@ -244,8 +262,8 @@ public class Folder {
 | name | VARCHAR(512) | NOT NULL | Filename |
 | file_type | ENUM | NOT NULL | PDF, DOCX, TXT, PPTX, XLSX |
 | file_size_bytes | BIGINT | NOT NULL | Size in bytes |
-| s3_key | VARCHAR(512) | NOT NULL | S3 object key |
-| s3_bucket | VARCHAR(255) | DEFAULT 'flowlearn-documents' | S3 bucket name |
+| r2_key | VARCHAR(512) | NOT NULL | R2 object key |
+| r2_bucket | VARCHAR(255) | DEFAULT 'flowlearn-documents' | R2 bucket name |
 | status | ENUM | DEFAULT 'uploading' | uploading, processing, ready, error |
 | error_message | TEXT | NULL | Error if any |
 | page_count | INT | NULL | Number of pages (PDF) |
@@ -299,11 +317,11 @@ public class Document {
     @Column(name = "file_size_bytes", nullable = false)
     private Long fileSizeBytes;
 
-    @Column(name = "s3_key", nullable = false, length = 512)
-    private String s3Key;
+    @Column(name = "r2_key", nullable = false, length = 512)
+    private String r2Key;
 
-    @Column(name = "s3_bucket", length = 255)
-    private String s3Bucket = "flowlearn-documents";
+    @Column(name = "r2_bucket", length = 255)
+    private String r2Bucket = "flowlearn-documents";
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -915,7 +933,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 - [x] Users table with role, status, plan enums
 - [x] Folders with nested support (parent_id self-reference)
-- [x] Documents with S3 metadata and status tracking
+- [x] Documents with R2 metadata and status tracking
 - [x] Study sessions with scope (file/folder)
 - [x] Summaries linked to study sessions
 - [x] Flashcards with importance levels
@@ -961,3 +979,170 @@ public interface UserRepository extends JpaRepository<User, String> {
 - **Soft Deletes**: Consider using soft deletes for subscriptions (add `deleted_at` column)
 - **Index Tuning**: Monitor query performance and add composite indexes as needed
 - **Partitioning**: Consider partitioning `study_activities` by date for large datasets
+
+---
+
+## Next Steps for Implementation
+
+### 1. Database Migration Setup
+
+**Add Flyway to `pom.xml`:**
+```xml
+<dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-core</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-mysql</artifactId>
+</dependency>
+```
+
+**Configure in `application.yml`:**
+```yaml
+spring:
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+```
+
+### 2. Create Migration Files
+
+Create SQL migration files in `src/main/resources/db/migration/` following the migration order above:
+
+- `V1__Create_users_table.sql`
+- `V2__Create_folders_table.sql`
+- `V3__Create_documents_table.sql`
+- ... (continuing through V14)
+
+**Example migration format:**
+```sql
+CREATE TABLE users (
+    id CHAR(36) PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
+    avatar_url VARCHAR(512),
+    role ENUM('USER', 'MODERATOR', 'SUPER_ADMIN') DEFAULT 'USER',
+    status ENUM('ACTIVE', 'WARNED', 'BANNED', 'SUSPENDED') DEFAULT 'ACTIVE',
+    plan ENUM('FREE', 'PRO') DEFAULT 'FREE',
+    storage_used_mb BIGINT DEFAULT 0,
+    storage_limit_mb INT DEFAULT 500,
+    warning_count INT DEFAULT 0,
+    last_login_at DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+    INDEX idx_role (role),
+    INDEX idx_status (status),
+    INDEX idx_plan (plan)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+### 3. Generate JPA Entities
+
+Create entity classes in `src/main/java/io/flowlearn/backend/entity/` using the annotations provided in each table's "Spring Boot Entity Notes" section.
+
+**Package structure:**
+```
+io.flowlearn.backend.entity/
+├── User.java
+├── Folder.java
+├── Document.java
+├── StudySession.java
+├── Summary.java
+├── Flashcard.java
+├── UserFlashcardProgress.java
+├── Quiz.java
+├── QuizQuestion.java
+├── QuizResult.java
+├── ChatMessage.java
+├── StudyActivity.java
+├── Subscription.java
+└── UserStats.java
+```
+
+### 4. Create Repositories
+
+Create Spring Data JPA repositories in `src/main/java/io/flowlearn/backend/repository/`:
+
+**Example:**
+```java
+@Repository
+public interface UserRepository extends JpaRepository<User, String> {
+    Optional<User> findByEmail(String email);
+
+    @Query("SELECT u FROM User u WHERE u.role = :role AND u.status = :status")
+    List<User> findByRoleAndStatus(
+        @Param("role") UserRole role,
+        @Param("status") UserStatus status
+    );
+
+    @Modifying
+    @Query("UPDATE User u SET u.storageUsedMb = u.storageUsedMb + :delta WHERE u.id = :id")
+    int updateStorageUsed(@Param("id") String id, @Param("delta") Long delta);
+}
+```
+
+### 5. Configure Database Connection
+
+**Add to `application.yml`:**
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/flowlearn?useSSL=false&serverTimezone=UTC
+    username: flowlearn_user
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate  # Use Flyway for schema management
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+```
+
+### 6. Enable JPA Auditing
+
+**Create `JpaConfig.java`:**
+```java
+@Configuration
+@EnableJpaAuditing
+public class JpaConfig {
+}
+```
+
+### 7. Testing
+
+**Create test database and run migrations:**
+```bash
+# Run Flyway migrations
+./mvnw flyway:migrate
+
+# Verify tables created
+mysql -u flowlearn_user -p flowlearn -e "SHOW TABLES;"
+```
+
+### 8. Verification Checklist
+
+After implementation:
+- [ ] All 14 tables created successfully
+- [ ] All foreign keys configured correctly
+- [ ] All indexes created
+- [ ] Enum values match frontend TypeScript types
+- [ ] JPA entities map correctly to tables
+- [ ] Repositories can perform basic CRUD operations
+- [ ] Auditing fields (created_at, updated_at) work automatically
+- [ ] Cascade deletes work as expected
+- [ ] Migration can run on fresh database
+- [ ] Migration can be rolled back if needed
+
+---
+
+**See Also:**
+- [API Specifications](./api-specs.md) - API endpoints that use these tables
+- [Backend CLAUDE.md](../backend/CLAUDE.md) - Backend coding standards
+- [Frontend CLAUDE.md](../frontend/CLAUDE.md) - Frontend type definitions
