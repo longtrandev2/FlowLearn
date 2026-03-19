@@ -10,4 +10,5 @@ public interface FlashcardService {
     Page<FlashcardDto> getFlashcardsBySession(String userEmail, String sessionId, Pageable pageable);
     Page<FlashcardProgressDto> getDueFlashcards(String userEmail, Pageable pageable);
     FlashcardProgressDto reviewFlashcard(String userEmail, String flashcardId, ReviewFlashcardRequest request);
+    java.util.List<FlashcardDto> getOrGenerateFlashcards(String userEmail, String sessionId);
 }

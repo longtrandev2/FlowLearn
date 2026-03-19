@@ -10,8 +10,10 @@ import java.util.Optional;
 
 @Repository
 public interface SummaryRepository extends JpaRepository<Summary, String> {
+    Optional<Summary> findFirstByStudySessionIdOrderByCreatedAtDesc(String studySessionId);
     Page<Summary> findByStudySessionId(String studySessionId, Pageable pageable);
     
     // Validate ownership via joined table
     Optional<Summary> findByIdAndStudySessionUserId(String id, String userId);
 }
+

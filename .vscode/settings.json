@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "java.configuration.updateBuildConfiguration": "interactive",
     "java.compile.nullAnalysis.mode": "automatic",
       "configurations": [
@@ -13,4 +14,8 @@
             "envFile": "${workspaceFolder}/backend/.env.local"
         }
     ]
+=======
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "interactive"
+>>>>>>> 82baa3754d22147e81dd7a751eb6a753e9aaf054
 }
