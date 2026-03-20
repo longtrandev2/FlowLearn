@@ -72,13 +72,13 @@ public class DocumentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDocument(
+    public ResponseEntity<ApiResponse<Void>> deleteDocument(
             @PathVariable String id,
             Authentication authentication
     ) {
         String userId = getUserId(authentication);
         documentService.deleteDocument(userId, id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     private String getUserId(Authentication authentication) {

@@ -76,13 +76,13 @@ public class FolderController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFolder(
+    public ResponseEntity<ApiResponse<Void>> deleteFolder(
             @PathVariable String id,
             Authentication authentication
     ) {
         String userId = getUserId(authentication);
         folderService.deleteFolder(userId, id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     private String getUserId(Authentication authentication) {

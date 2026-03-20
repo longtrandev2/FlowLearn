@@ -6,6 +6,7 @@ import com.example.backend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import com.example.backend.dto.ApiResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,16 +20,16 @@ public class SessionController {
     private final AuthService authService;
 
     @PostMapping
-    public ResponseEntity<AuthResponse> login(
+    public ResponseEntity<ApiResponse<AuthResponse>> login(
             @Valid @RequestBody LoginRequest request
     ) {
-        return ResponseEntity.ok(authService.login(request));
+        return ResponseEntity.ok(ApiResponse.success(authService.login(request)));
     }
 
     @PostMapping("/admin")
-    public ResponseEntity<AuthResponse> adminLogin(
+    public ResponseEntity<ApiResponse<AuthResponse>> adminLogin(
             @Valid @RequestBody LoginRequest request
     ) {
-        return ResponseEntity.ok(authService.adminLogin(request));
+        return ResponseEntity.ok(ApiResponse.success(authService.adminLogin(request)));
     }
 }
