@@ -1,20 +1,20 @@
-# RESTful API Specification - FlowLearn
+﻿# RESTful API Specification - FlowLearn
 
 ## Overview
 
 **Base URL:** `https://api.flowlearn.io/api/v1`
-> **⚠️ Implementation Status:** Backend not yet implemented. Frontend currently uses MSW (Mock Service Worker) for development. The base URL above is the planned production URL.
+> **âš ï¸ Implementation Status:** Backend not yet implemented. Frontend currently uses MSW (Mock Service Worker) for development. The base URL above is the planned production URL.
 
 **Version:** v1
 
 **Authentication:** Bearer JWT (JSON Web Token)
-> **⚠️ Implementation Status:** JWT authentication designed but not implemented. Frontend uses mock authentication.
+> **âš ï¸ Implementation Status:** JWT authentication designed but not implemented. Frontend uses mock authentication.
 
 **Content-Type:** `application/json` (except for file upload: `multipart/form-data`)
 
 ### Rate Limiting
 
-> **⚠️ Implementation Status:** Planned feature - not yet implemented
+> **âš ï¸ Implementation Status:** Planned feature - not yet implemented
 
 **Planned Implementation:**
 - **Free users:** 100 requests/minute
@@ -69,11 +69,11 @@
 
 ### JWT Token Lifecycle
 
-1. **User Login/Register** → Returns `accessToken` (short-lived) + `refreshToken` (long-lived)
+1. **User Login/Register** â†’ Returns `accessToken` (short-lived) + `refreshToken` (long-lived)
 2. **Client** stores tokens in localStorage/secure storage
 3. **API Requests** include `Authorization: Bearer <accessToken>` header
-4. **Token Refresh** (401 response) → Client calls `/auth/refresh` with `refreshToken`
-5. **Logout** → Client calls `/auth/logout`, invalidates `refreshToken`
+4. **Token Refresh** (401 response) â†’ Client calls `/auth/refresh` with `refreshToken`
+5. **Logout** â†’ Client calls `/auth/logout`, invalidates `refreshToken`
 
 ### Token Expiration
 
@@ -86,21 +86,21 @@
 
 ### Implementation Status Legend
 
-- 🚧 **Frontend Only** - Frontend UI exists with MSW mock handlers, no backend implementation
-- ✅ **Implemented** - Both frontend and backend working (currently none)
-- 📋 **Planned** - Fully specified but not yet implemented
-- ❌ **Not Started** - No implementation exists
+- ðŸš§ **Frontend Only** - Frontend UI exists with MSW mock handlers, no backend implementation
+- âœ… **Implemented** - Both frontend and backend working (currently none)
+- ðŸ“‹ **Planned** - Fully specified but not yet implemented
+- âŒ **Not Started** - No implementation exists
 
 ---
 
 ### 1. Authentication APIs
-> **Status:** 🚧 Frontend Only - Mock implementation in MSW handlers
+> **Status:** ðŸš§ Frontend Only - Mock implementation in MSW handlers
 
 **Total Endpoints:** 8
 
 #### 1.1 Register
 
-**Endpoint:** `POST /api/v1/auth/register`
+**Endpoint:** `POST /api/v1/users`
 
 **Description:** Register a new user account.
 
@@ -146,7 +146,7 @@
 
 #### 1.2 Login
 
-**Endpoint:** `POST /api/v1/auth/login`
+**Endpoint:** `POST /api/v1/sessions`
 
 **Description:** Authenticate user with email and password.
 
@@ -191,7 +191,7 @@
 
 #### 1.3 Admin Login
 
-**Endpoint:** `POST /api/v1/auth/admin/login`
+**Endpoint:** `POST /api/v1/sessions/admin`
 
 **Description:** Authenticate admin user (MODERATOR or SUPER_ADMIN only).
 
@@ -381,7 +381,7 @@
 ---
 
 ### 2. Document Management APIs
-> **Status:** 📋 Planned - Fully specified, no implementation
+> **Status:** ðŸ“‹ Planned - Fully specified, no implementation
 
 **Total Endpoints:** 6
 
@@ -629,7 +629,7 @@ Authorization: Bearer <accessToken>
 ---
 
 ### 3. Folder Management APIs
-> **Status:** 📋 Planned - Frontend types exist, no API calls
+> **Status:** ðŸ“‹ Planned - Frontend types exist, no API calls
 
 **Total Endpoints:** 6
 
@@ -904,7 +904,7 @@ Authorization: Bearer <accessToken>
 ---
 
 ### 4. Study Session APIs
-> **Status:** 📋 Planned - Frontend pages exist, no API integration
+> **Status:** ðŸ“‹ Planned - Frontend pages exist, no API integration
 
 **Total Endpoints:** 6
 
@@ -1175,7 +1175,7 @@ Authorization: Bearer <accessToken>
 ---
 
 ### 5. Flashcard & SRS APIs
-> **Status:** 📋 Planned - Frontend types exist, no API calls
+> **Status:** ðŸ“‹ Planned - Frontend types exist, no API calls
 
 **Total Endpoints:** 4
 
@@ -1376,7 +1376,7 @@ Authorization: Bearer <accessToken>
 ---
 
 ### 6. Dashboard & Statistics APIs
-> **Status:** 🚧 Frontend Only - Dashboard UI with mock data
+> **Status:** ðŸš§ Frontend Only - Dashboard UI with mock data
 
 **Total Endpoints:** 4
 
@@ -1567,11 +1567,11 @@ Authorization: Bearer <accessToken>
 ---
 
 ### 7. Chat with Documents APIs
-> **Status:** 🔄 **Architecture Change** - Originally designed as backend endpoint, now implemented as direct Gemini API calls from frontend
+> **Status:** ðŸ”„ **Architecture Change** - Originally designed as backend endpoint, now implemented as direct Gemini API calls from frontend
 
 **Total Endpoints:** 2
 
-**⚠️ Important Implementation Note:**
+**âš ï¸ Important Implementation Note:**
 The chat functionality is currently implemented differently than originally designed:
 - **Original Design:** Backend RAG system with vector database and streaming responses
 - **Current Implementation:** Frontend makes direct calls to Google Gemini API
@@ -1680,7 +1680,7 @@ data: {"id":"550e8400-e29b-41d4-a716-446655440001","role":"model","content":".",
 ---
 
 ### 8. Quiz APIs
-> **Status:** 📋 Planned - Quiz UI exists, no backend integration
+> **Status:** ðŸ“‹ Planned - Quiz UI exists, no backend integration
 
 **Total Endpoints:** 4
 
@@ -1861,7 +1861,7 @@ Authorization: Bearer <accessToken>
 ---
 
 ### 9. Subscription APIs
-> **Status:** ❌ Not Started - No implementation
+> **Status:** âŒ Not Started - No implementation
 
 **Total Endpoints:** 4
 
