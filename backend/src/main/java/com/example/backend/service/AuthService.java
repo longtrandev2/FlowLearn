@@ -31,6 +31,10 @@ public class AuthService {
                 .fullName(request.fullName())
                 .email(request.email())
                 .passwordHash(passwordEncoder.encode(request.password()))
+                .role(com.example.backend.enums.UserRole.USER)
+                .status(com.example.backend.enums.UserStatus.ACTIVE)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
         userRepository.save(user);
         final UserDetails userDetails = User.builder()

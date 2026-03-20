@@ -4,6 +4,7 @@ import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -27,6 +28,11 @@ public class ApplicationConfig {
     }
 
     @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
+    @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username)
                 .map(user -> User.builder()
@@ -39,7 +45,8 @@ public class ApplicationConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
-        final DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService());
+        final DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
