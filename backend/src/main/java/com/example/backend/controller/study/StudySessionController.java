@@ -76,7 +76,7 @@ public class StudySessionController {
             ));
         }
         // Future expansions for other statuses can be handled here
-        return ResponseEntity.badRequest().body(ApiResponse.error("Only 'ENDED' status is currently supported for updates."));
+        return ResponseEntity.badRequest().body(ApiResponse.error(new com.example.backend.dto.ApiError("INVALID_STATUS", "Only 'ENDED' status is currently supported for updates.", null)));
     }
 
     @GetMapping("/{id}/flashcards")

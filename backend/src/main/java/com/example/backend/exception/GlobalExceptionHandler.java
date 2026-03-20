@@ -38,12 +38,8 @@ public class GlobalExceptionHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.toList());
 
-        Map<String, Object> errorMap = new HashMap<>();
-        errorMap.put("code", "VALIDATION_ERROR");
-        errorMap.put("message", "Validation failed");
-        errorMap.put("details", details);
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(errorMap));
+        com.example.backend.dto.ApiError apiError = new com.example.backend.dto.ApiError("VALIDATION_ERROR", "Validation failed", details);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(apiError));
     }
 
     @ExceptionHandler(Exception.class)
@@ -52,9 +48,7 @@ public class GlobalExceptionHandler {
     }
 
     private ResponseEntity<ApiResponse<Void>> buildErrorResponse(String code, String message, HttpStatus status) {
-        Map<String, Object> errorMap = new HashMap<>();
-        errorMap.put("code", code);
-        errorMap.put("message", message);
-        return ResponseEntity.status(status).body(ApiResponse.error(errorMap));
+        com.example.backend.dto.ApiError apiError = new com.example.backend.dto.ApiError(code, message, null);
+        return ResponseEntity.status(status).body(ApiResponse.error(apiError));
     }
 }

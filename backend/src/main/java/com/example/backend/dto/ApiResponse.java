@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class ApiResponse<T> {
     private boolean success;
     private T data;
-    private Object error;
+    private ApiError error;
 
     public static <T> ApiResponse<T> success(T data) {
         return ApiResponse.<T>builder()
@@ -23,7 +23,7 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    public static <T> ApiResponse<T> error(Object errorInfo) {
+    public static <T> ApiResponse<T> error(ApiError errorInfo) {
         return ApiResponse.<T>builder()
                 .success(false)
                 .error(errorInfo)
