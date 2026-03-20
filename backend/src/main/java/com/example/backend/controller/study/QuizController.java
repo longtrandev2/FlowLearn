@@ -23,17 +23,7 @@ public class QuizController {
 
     private final QuizService quizService;
 
-    @GetMapping("/session/{sessionId}")
-    public ResponseEntity<ApiResponse<QuizDto>> getQuizBySession(
-            Authentication authentication,
-            @PathVariable String sessionId
-    ) {
-        return ResponseEntity.ok(ApiResponse.success(
-                quizService.getQuizBySession(authentication.getName(), sessionId)
-        ));
-    }
-
-    @PostMapping("/{quizId}/submit")
+    @PostMapping("/{quizId}/submissions")
     public ResponseEntity<ApiResponse<QuizResultDto>> submitQuiz(
             Authentication authentication,
             @PathVariable String quizId,

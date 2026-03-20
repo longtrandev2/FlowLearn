@@ -26,18 +26,6 @@ public class FlashcardController {
 
     private final FlashcardService flashcardService;
 
-    @GetMapping("/session/{sessionId}")
-    public ResponseEntity<ApiResponse<Page<FlashcardDto>>> getBySession(
-            Authentication authentication,
-            @PathVariable String sessionId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
-        return ResponseEntity.ok(ApiResponse.success(
-                flashcardService.getFlashcardsBySession(authentication.getName(), sessionId, PageRequest.of(page, size))
-        ));
-    }
-
     @GetMapping("/due")
     public ResponseEntity<ApiResponse<Page<FlashcardProgressDto>>> getDueFlashcards(
             Authentication authentication,
@@ -49,7 +37,7 @@ public class FlashcardController {
         ));
     }
 
-    @PostMapping("/{flashcardId}/review")
+    @PostMapping("/{flashcardId}/reviews")
     public ResponseEntity<ApiResponse<FlashcardProgressDto>> reviewFlashcard(
             Authentication authentication,
             @PathVariable String flashcardId,

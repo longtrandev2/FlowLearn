@@ -3,7 +3,11 @@ package com.example.backend.controller.study;
 import com.example.backend.dto.ApiResponse;
 import com.example.backend.dto.study.CreateStudySessionRequest;
 import com.example.backend.dto.study.StudySessionDto;
+import com.example.backend.dto.study.FlashcardDto;
+import com.example.backend.dto.study.QuizDto;
 import com.example.backend.service.study.StudySessionService;
+import com.example.backend.service.study.FlashcardService;
+import com.example.backend.service.study.QuizService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class StudySessionController {
 
     private final StudySessionService studySessionService;
+    private final FlashcardService flashcardService;
+    private final QuizService quizService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<StudySessionDto>> createSession(
@@ -71,5 +77,27 @@ public class StudySessionController {
         }
         // Future expansions for other statuses can be handled here
         return ResponseEntity.badRequest().body(ApiResponse.error("Only 'ENDED' status is currently supported for updates."));
+    }
+
+    @GetMapping("/{id}/flashcards")
+    public ResponseEntity<ApiResponse<Page<FlashcardDto>>> getSessionFlashcards(
+            Authentication authentication,
+            @PathVariable String id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                flashcardService.getFlashcardsBySession(authentication.getName(), id, PageRequest.of(page, size))
+        ));
+    }
+
+    @GetMapping("/{id}/quizzes")
+    public ResponseEntity<ApiResponse<QuizDto>> getSessionQuizzes(
+            Authentication authentication,
+            @PathVariable String id
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                quizService.getQuizBySession(authentication.getName(), id)
+        ));
     }
 }
