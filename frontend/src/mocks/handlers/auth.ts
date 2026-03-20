@@ -1,4 +1,4 @@
-import { http, HttpResponse } from 'msw';
+﻿import { http, HttpResponse } from 'msw';
 import { getUserById } from '../data/users';
 
 const API_BASE_URL = 'https://api.flowlearn.io/api/v1';
@@ -23,8 +23,8 @@ const createErrorResponse = (code: string, message: string) => ({
 });
 
 export const authHandlers = [
-  // 2.1 POST /auth/register
-  http.post(`${API_BASE_URL}/auth/register`, async ({ request }) => {
+  // 2.1 POST /users
+  http.post(`${API_BASE_URL}/users`, async ({ request }) => {
     const body = await request.json() as {
       email: string;
       password: string;
@@ -59,8 +59,8 @@ export const authHandlers = [
     );
   }),
 
-  // 2.2 POST /auth/login
-  http.post(`${API_BASE_URL}/auth/login`, async ({ request }) => {
+  // 2.2 POST /sessions
+  http.post(`${API_BASE_URL}/sessions`, async ({ request }) => {
     const body = await request.json() as {
       email: string;
       password: string;
@@ -91,8 +91,8 @@ export const authHandlers = [
     );
   }),
 
-  // 2.3 POST /auth/admin/login
-  http.post(`${API_BASE_URL}/auth/admin/login`, async ({ request }) => {
+  // 2.3 POST /sessions/admin
+  http.post(`${API_BASE_URL}/sessions/admin`, async ({ request }) => {
     const body = await request.json() as {
       email: string;
       password: string;
