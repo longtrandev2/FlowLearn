@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -57,13 +58,18 @@ public class StudySessionController {
         ));
     }
 
-    @PutMapping("/{id}/end")
-    public ResponseEntity<ApiResponse<StudySessionDto>> endSession(
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse<StudySessionDto>> updateSessionStatus(
             Authentication authentication,
-            @PathVariable String id
+            @PathVariable String id,
+            @RequestBody com.example.backend.dto.study.UpdateSessionStatusRequest request
     ) {
-        return ResponseEntity.ok(ApiResponse.success(
-                studySessionService.endSession(authentication.getName(), id)
-        ));
+        if ("ENDED".equalsIgnoreCase(request.getStatus())) {
+            return ResponseEntity.ok(ApiResponse.success(
+                    studySessionService.endSession(authentication.getName(), id)
+            ));
+        }
+        // Future expansions for other statuses can be handled here
+        return ResponseEntity.badRequest().body(ApiResponse.error("Only 'ENDED' status is currently supported for updates."));
     }
 }
