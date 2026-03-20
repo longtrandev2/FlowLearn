@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
@@ -39,7 +39,7 @@ export function MSWTestPage() {
           <div className="space-y-2">
             <Button
               onClick={() =>
-                testAPI('/auth/admin/login', {
+                testAPI('/sessions/admin', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
@@ -54,7 +54,7 @@ export function MSWTestPage() {
             </Button>
             <Button
               onClick={() =>
-                testAPI('/auth/login', {
+                testAPI('/sessions', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
