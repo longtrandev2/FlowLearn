@@ -69,12 +69,8 @@ public class Document {
     @Column(name = "file_size_bytes", nullable = false)
     private Long fileSizeBytes;
 
-    @Column(name = "r2_key", nullable = false, length = 512)
-    private String r2Key;
-
-    @Column(name = "r2_bucket", length = 255)
-    @Builder.Default
-    private String r2Bucket = "flowlearn-documents";
+    @Column(name = "cloudinary_id", nullable = false, length = 512)
+    private String cloudinaryId;
 
     @Convert(converter = DocumentStatusConverter.class)
     @Column(nullable = false, length = 32)

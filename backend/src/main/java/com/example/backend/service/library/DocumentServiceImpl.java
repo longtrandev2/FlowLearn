@@ -45,22 +45,22 @@ public class DocumentServiceImpl implements DocumentService {
             type = FileType.DOCX;
         }
 
-        String r2Key = "";
+        String cloudinaryId = "";
         String parsedContent = "";
         DocumentStatus status = DocumentStatus.READY;
         String errorMessage = null;
         Integer pageCount = null;
         
         try {
-            // 1. Upload to Cloudflare R2
-            r2Key = fileStorageService.uploadFile(file);
+            // 1. Upload to Cloudinary
+            cloudinaryId = fileStorageService.uploadFile(file);
             
             // 2. Parse text content
             parsedContent = fileParserService.parseDocument(file);
             
-            // 3. Save parsed content text to R2 as "{r2Key}.txt"
+            // 3. Save parsed content text to Cloudinary as "{cloudinaryId}.txt"
             if (parsedContent != null && !parsedContent.isEmpty()) {
-                fileStorageService.uploadText(r2Key + ".txt", parsedContent);
+                fileStorageService.uploadText(cloudinaryId + ".txt", parsedContent);
             }
             
             // Optional: calculate rough page count if desired or rely on Tika metadata later
@@ -78,8 +78,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .name(file.getOriginalFilename() != null ? file.getOriginalFilename() : "Untitled")
                 .fileType(type)
                 .fileSizeBytes(file.getSize())
-                .r2Key(r2Key)
-                .r2Bucket("flowlearn-documents") // Could also inject from environment
+                .cloudinaryId(cloudinaryId)
                 .status(status)
                 .errorMessage(errorMessage)
                 .pageCount(pageCount)
@@ -138,9 +137,9 @@ public class DocumentServiceImpl implements DocumentService {
                 .orElseThrow(() -> new IllegalArgumentException("Document not found"));
         
         try {
-            if (document.getR2Key() != null && !document.getR2Key().isEmpty()) {
-                fileStorageService.deleteFile(document.getR2Key());
-                fileStorageService.deleteFile(document.getR2Key() + ".txt");
+            if (document.getCloudinaryId() != null && !document.getCloudinaryId().isEmpty()) {
+                fileStorageService.deleteFile(document.getCloudinaryId());
+                fileStorageService.deleteFile(document.getCloudinaryId() + ".txt");
             }
         } catch (Exception e) {
             log.error("Failed to delete file from R2 for document ID: {}", documentId, e);

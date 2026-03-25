@@ -86,7 +86,7 @@ public class SummaryServiceImpl implements SummaryService {
                     .orElseThrow(() -> new IllegalArgumentException("Document not found"));
             
             try {
-                return fileStorageService.downloadText(doc.getR2Key() + ".txt");
+                return fileStorageService.downloadText(doc.getCloudinaryId() + ".txt");
             } catch (Exception e) {
                 log.error("Failed to fetch text content for document {}", doc.getId(), e);
                 // Fallback or throw error. The user wants gracefulness.
