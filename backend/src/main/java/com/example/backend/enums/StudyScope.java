@@ -4,8 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum StudyScope {
-    FILE("file"),
-    FOLDER("folder");
+    FILE("file");
 
     private final String value;
 

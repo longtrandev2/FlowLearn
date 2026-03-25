@@ -5,6 +5,9 @@ import com.example.backend.dto.study.CreateStudySessionRequest;
 import com.example.backend.dto.study.StudySessionDto;
 import com.example.backend.dto.study.SummaryDto;
 import com.example.backend.dto.study.SessionFeedbackDto;
+import com.example.backend.dto.study.FlashcardDto;
+import com.example.backend.dto.study.QuizDto;
+import java.util.List;
 import com.example.backend.service.study.StudySessionService;
 import com.example.backend.service.study.SummaryService;
 import com.example.backend.service.study.SessionFeedbackService;
@@ -101,6 +104,29 @@ public class StudySessionController {
     ) {
         return ResponseEntity.ok(ApiResponse.success(
                 sessionFeedbackService.getOrGenerateFeedback(authentication.getName(), id)
+        ));
+    }
+
+    @Operation(summary = "Get session flashcards", description = "Get AI-generated flashcards for the study session.")
+    @GetMapping("/{id}/flashcards")
+    public ResponseEntity<ApiResponse<List<FlashcardDto>>> getSessionFlashcards(
+            @Parameter(hidden = true) Authentication authentication,
+            @Parameter(description = "The session ID") @PathVariable String id
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                studySessionService.getSessionFlashcards(authentication.getName(), id)
+        ));
+    }
+
+    @Operation(summary = "Get session quiz", description = "Get AI-generated quiz for the study session.")
+    @GetMapping("/{id}/quiz")
+    public ResponseEntity<ApiResponse<QuizDto>> getSessionQuiz(
+            @Parameter(hidden = true) Authentication authentication,
+            @Parameter(description = "The session ID") @PathVariable String id,
+            @Parameter(description = "Optional cognitive level (e.g., recall, understand, apply)") @RequestParam(required = false) String cognitiveLevel
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                studySessionService.getSessionQuiz(authentication.getName(), id, cognitiveLevel)
         ));
     }
 }

@@ -92,10 +92,6 @@ public class SummaryServiceImpl implements SummaryService {
                 // Fallback or throw error. The user wants gracefulness.
                 return "Note: Content could not be extracted or is missing.";
             }
-        } else if (session.getScope() == com.example.backend.enums.StudyScope.FOLDER) {
-            // Complex case: Folder contains multiple files. For now, merge them.
-            // ... (simplifying logic: just fetching the first document or concatenating)
-            return "Folder summary logic not fully implemented yet.";
         }
         return "";
     }

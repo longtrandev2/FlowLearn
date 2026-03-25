@@ -5,11 +5,12 @@ import com.example.backend.dto.study.StudySessionDto;
 import com.example.backend.entity.StudySession;
 import com.example.backend.entity.User;
 import com.example.backend.repository.DocumentRepository;
-import com.example.backend.repository.FolderRepository;
 import com.example.backend.repository.StudySessionRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.ai.AiGenerationService;
 import com.example.backend.service.study.SummaryService;
+import com.example.backend.service.study.FlashcardService;
+import com.example.backend.service.study.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +29,9 @@ public class StudySessionServiceImpl implements StudySessionService {
     private final StudySessionRepository studySessionRepository;
     private final UserRepository userRepository;
     private final DocumentRepository documentRepository;
-    private final FolderRepository folderRepository;
     private final SummaryService summaryService;
+    private final FlashcardService flashcardService;
+    private final QuizService quizService;
 
     @Override
     @Transactional
@@ -37,15 +39,11 @@ public class StudySessionServiceImpl implements StudySessionService {
         User user = getUserByEmail(userEmail);
 
         // Validate scope ownership to prevent IDOR
-        switch (request.scope()) {
-            case FILE:
-                documentRepository.findByIdAndUserId(request.scopeId(), user.getId())
-                        .orElseThrow(() -> new IllegalArgumentException("Document not found or access denied"));
-                break;
-            case FOLDER:
-                folderRepository.findByIdAndUserId(request.scopeId(), user.getId())
-                        .orElseThrow(() -> new IllegalArgumentException("Folder not found or access denied"));
-                break;
+        if (request.scope() == com.example.backend.enums.StudyScope.FILE) {
+            documentRepository.findByIdAndUserId(request.scopeId(), user.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Document not found or access denied"));
+        } else {
+            throw new IllegalArgumentException("Only FILE scope is permitted for study sessions");
         }
 
         StudySession session = StudySession.builder()
@@ -111,17 +109,15 @@ public class StudySessionServiceImpl implements StudySessionService {
     @Override
     @Transactional
     public java.util.List<com.example.backend.dto.study.FlashcardDto> getSessionFlashcards(String userEmail, String sessionId) {
-        // Will be wired to FlashcardService generate logic shortly
-        // For now, return empty or implement immediately
-        return new java.util.ArrayList<>();
+        return flashcardService.getOrGenerateFlashcards(userEmail, sessionId);
     }
 
     @Override
     @Transactional
     public com.example.backend.dto.study.QuizDto getSessionQuiz(String userEmail, String sessionId, String cognitiveLevel) {
-        // Will be wired to QuizService generate logic shortly
-        // For now, return empty or implement immediately
-        return null; // TODO implement
+        // cognitiveLevel isn't fully wired into existing getQuizBySession yet, but we map it if necessary 
+        // For now getQuizBySession generates if missing.
+        return quizService.getQuizBySession(userEmail, sessionId);
     }
 
     private StudySessionDto mapToDto(StudySession session) {
