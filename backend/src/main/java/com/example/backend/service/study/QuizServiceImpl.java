@@ -181,7 +181,7 @@ public class QuizServiceImpl implements QuizService {
             Document doc = documentRepository.findById(session.getScopeId())
                     .orElseThrow(() -> new IllegalArgumentException("Document not found"));
             try {
-                return fileStorageService.downloadText(doc.getR2Key() + ".txt");
+                return fileStorageService.downloadText(doc.getCloudinaryId() + ".txt");
             } catch (Exception e) {
                 log.error("Failed to fetch text content for document {}", doc.getId(), e);
                 return "Note: Content could not be extracted or is missing.";
