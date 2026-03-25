@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 
 import java.util.Arrays;
@@ -35,6 +36,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/documents")
 @RequiredArgsConstructor
+@Tag(name = "Document Management", description = "File Upload & Management APIs")
 public class DocumentController {
 
     private final DocumentService documentService;
