@@ -4,8 +4,10 @@ import com.example.backend.dto.ApiResponse;
 import com.example.backend.dto.study.CreateStudySessionRequest;
 import com.example.backend.dto.study.StudySessionDto;
 import com.example.backend.dto.study.SummaryDto;
+import com.example.backend.dto.study.SessionFeedbackDto;
 import com.example.backend.service.study.StudySessionService;
 import com.example.backend.service.study.SummaryService;
+import com.example.backend.service.study.SessionFeedbackService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,6 +34,7 @@ public class StudySessionController {
 
     private final StudySessionService studySessionService;
     private final SummaryService summaryService;
+    private final SessionFeedbackService sessionFeedbackService;
 
     @Operation(summary = "Create a study session", description = "Create a new learning session for a specific target element.")
     @PostMapping
@@ -78,7 +81,7 @@ public class StudySessionController {
         ));
     }
 
-    @Operation(summary = "Get session summary", description = "Get AI-generated summary for the study session.")
+    @Operation(summary = "Get session summary", description = "Get AI-generated summary for the study session based on pre-study materials.")
     @GetMapping("/{id}/summary")
     public ResponseEntity<ApiResponse<SummaryDto>> getSessionSummary(
             @Parameter(hidden = true) Authentication authentication,
@@ -87,6 +90,17 @@ public class StudySessionController {
     ) {
         return ResponseEntity.ok(ApiResponse.success(
                 summaryService.getOrCreateSessionSummary(authentication.getName(), id, goalId)
+        ));
+    }
+
+    @Operation(summary = "Get session feedback", description = "Get AI-generated evaluation for a completed study session based on quiz and flashcard performance.")
+    @GetMapping("/{id}/feedback")
+    public ResponseEntity<ApiResponse<SessionFeedbackDto>> getSessionFeedback(
+            @Parameter(hidden = true) Authentication authentication,
+            @Parameter(description = "The session ID") @PathVariable String id
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                sessionFeedbackService.getOrGenerateFeedback(authentication.getName(), id)
         ));
     }
 }

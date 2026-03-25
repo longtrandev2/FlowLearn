@@ -86,6 +86,21 @@ public class GeminiGenerationServiceImpl implements AiGenerationService {
         return callGeminiApi(prompt);
     }
 
+    @Override
+    public String generateSessionFeedback(StudySession session, String performanceData) {
+        String prompt = "You are an AI tutor providing feedback on a student's study session performance.\n" +
+                "Evaluate the student's performance based on the following data (which includes quiz results and flashcard reviews).\n" +
+                "Output strictly valid JSON with the following structure, and no other text or markdown formatting:\n" +
+                "{\n" +
+                "  \"weakAreas\": [\"concept 1\", \"concept 2\"],\n" +
+                "  \"suggestedFocus\": \"Actionable advice on what to study next based on mistakes.\",\n" +
+                "  \"overallScore\": 85\n" +
+                "}\n" +
+                "Performance Data:\n" +
+                performanceData;
+        return callGeminiApi(prompt);
+    }
+
     private String callGeminiApi(String prompt) {
         String url = geminiApiUrl + "?key=" + geminiApiKey;
 
