@@ -6,11 +6,16 @@ import com.example.backend.dto.folder.UpdateFolderRequest;
 import com.example.backend.entity.Folder;
 import com.example.backend.repository.DocumentRepository;
 import com.example.backend.repository.FolderRepository;
+import com.example.backend.dto.folder.BreadcrumbDto;
+import com.example.backend.dto.folder.FolderContentsDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,6 +26,8 @@ public class FolderServiceImpl implements FolderService {
 
     private final FolderRepository folderRepository;
     private final DocumentRepository documentRepository;
+    @Lazy
+    private final DocumentService documentService;
 
     @Override
     @Transactional
@@ -82,13 +89,36 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public List<FolderDto> getSubFolders(String userId, String parentId) {
+    public FolderContentsDto getFolderContents(String userId, String parentId) {
         // Verify parent belongs to user
-        folderRepository.findByIdAndUserId(parentId, userId)
+        Folder parentFolder = folderRepository.findByIdAndUserId(parentId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Parent folder not found"));
                 
         List<Folder> folders = folderRepository.findByUserIdAndParentIdOrderByCreatedAtDesc(userId, parentId);
-        return folders.stream().map(this::mapToDto).collect(Collectors.toList());
+        List<FolderDto> subfolders = folders.stream().map(this::mapToDto).collect(Collectors.toList());
+        
+        List<com.example.backend.dto.document.DocumentDto> documents = documentService.getDocumentsInFolder(userId, parentId);
+        
+        // Build breadcrumbs
+        List<BreadcrumbDto> breadcrumbs = new ArrayList<>();
+        Folder current = parentFolder;
+        while (current != null) {
+            breadcrumbs.add(BreadcrumbDto.builder().id(current.getId()).name(current.getName()).build());
+            if (current.getParentId() != null) {
+                current = folderRepository.findById(current.getParentId()).orElse(null);
+            } else {
+                current = null;
+            }
+        }
+        breadcrumbs.add(BreadcrumbDto.builder().id(null).name("My Library").build());
+        Collections.reverse(breadcrumbs);
+
+        return FolderContentsDto.builder()
+                .folder(mapToDto(parentFolder))
+                .subfolders(subfolders)
+                .documents(documents)
+                .breadcrumbs(breadcrumbs)
+                .build();
     }
 
     @Override

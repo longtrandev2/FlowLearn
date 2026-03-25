@@ -56,13 +56,13 @@ public class FolderController {
         return ResponseEntity.ok(ApiResponse.success(folderService.getFolder(userId, id)));
     }
 
-    @GetMapping("/{id}/subfolders")
-    public ResponseEntity<ApiResponse<List<FolderDto>>> getSubFolders(
+    @GetMapping("/{id}/contents")
+    public ResponseEntity<ApiResponse<com.example.backend.dto.folder.FolderContentsDto>> getFolderContents(
             @PathVariable String id,
             Authentication authentication
     ) {
         String userId = getUserId(authentication);
-        return ResponseEntity.ok(ApiResponse.success(folderService.getSubFolders(userId, id)));
+        return ResponseEntity.ok(ApiResponse.success(folderService.getFolderContents(userId, id)));
     }
 
     @PutMapping("/{id}")

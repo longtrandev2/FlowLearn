@@ -15,7 +15,7 @@ public interface FolderService {
     
     List<FolderDto> getRootFolders(String userId);
     
-    List<FolderDto> getSubFolders(String userId, String parentId);
+    com.example.backend.dto.folder.FolderContentsDto getFolderContents(String userId, String folderId);
     
     void deleteFolder(String userId, String folderId);
 }

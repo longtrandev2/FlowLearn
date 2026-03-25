@@ -13,6 +13,8 @@ public interface DocumentService {
     
     DocumentDto getDocument(String userId, String documentId);
     
+    com.example.backend.dto.document.DocumentStatusResponse getDocumentStatus(String userId, String documentId);
+    
     List<DocumentDto> getDocumentsInFolder(String userId, String folderId);
     
     void deleteDocument(String userId, String documentId);

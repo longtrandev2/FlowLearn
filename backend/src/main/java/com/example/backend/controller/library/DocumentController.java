@@ -88,6 +88,15 @@ public class DocumentController {
         return ResponseEntity.ok(ApiResponse.success(documentService.getDocument(userId, id)));
     }
 
+    @GetMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<com.example.backend.dto.document.DocumentStatusResponse>> getDocumentStatus(
+            @PathVariable String id,
+            Authentication authentication
+    ) {
+        String userId = getUserId(authentication);
+        return ResponseEntity.ok(ApiResponse.success(documentService.getDocumentStatus(userId, id)));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<DocumentDto>> updateDocument(
             @PathVariable String id,

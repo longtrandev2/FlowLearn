@@ -118,6 +118,28 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    public com.example.backend.dto.document.DocumentStatusResponse getDocumentStatus(String userId, String documentId) {
+        Document document = documentRepository.findByIdAndUserId(documentId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+        
+        int progress = 0;
+        if (document.getStatus() == DocumentStatus.UPLOADING) {
+            progress = 10;
+        } else if (document.getStatus() == DocumentStatus.PROCESSING) {
+            progress = 50;
+        } else if (document.getStatus() == DocumentStatus.READY) {
+            progress = 100;
+        }
+        
+        return com.example.backend.dto.document.DocumentStatusResponse.builder()
+                .id(document.getId())
+                .status(document.getStatus().getValue())
+                .progress(progress)
+                .errorMessage(document.getErrorMessage())
+                .build();
+    }
+
+    @Override
     public List<DocumentDto> getDocumentsInFolder(String userId, String folderId) {
         List<Document> documents;
         if (folderId == null || folderId.isEmpty()) {
