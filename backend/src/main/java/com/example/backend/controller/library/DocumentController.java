@@ -70,27 +70,40 @@ public class DocumentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(document));
     }
 
+    @Operation(summary = "List documents", description = "Retrieve a list of documents in a specific folder or at the root level if no folderId is provided.")
     @GetMapping
     public ResponseEntity<ApiResponse<List<DocumentDto>>> getDocuments(
-            @RequestParam(value = "folderId", required = false) String folderId,
+            @Parameter(description = "Optional folder ID to filter documents") @RequestParam(value = "folderId", required = false) String folderId,
             Authentication authentication
     ) {
         String userId = getUserId(authentication);
         return ResponseEntity.ok(ApiResponse.success(documentService.getDocumentsInFolder(userId, folderId)));
     }
 
+    @Operation(summary = "Get document", description = "Retrieve a single document by its ID.")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<DocumentDto>> getDocument(
-            @PathVariable String id,
+            @Parameter(description = "The ID of the document") @PathVariable String id,
             Authentication authentication
     ) {
         String userId = getUserId(authentication);
         return ResponseEntity.ok(ApiResponse.success(documentService.getDocument(userId, id)));
     }
 
+    @Operation(summary = "Get document processing status", description = "Poll the current ai/system processing status for a given document.")
+    @GetMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<com.example.backend.dto.document.DocumentStatusResponse>> getDocumentStatus(
+            @Parameter(description = "The ID of the document") @PathVariable String id,
+            Authentication authentication
+    ) {
+        String userId = getUserId(authentication);
+        return ResponseEntity.ok(ApiResponse.success(documentService.getDocumentStatus(userId, id)));
+    }
+
+    @Operation(summary = "Update document", description = "Update a document's details such as it's name or move it to another folder.")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<DocumentDto>> updateDocument(
-            @PathVariable String id,
+            @Parameter(description = "The ID of the document to update") @PathVariable String id,
             @Valid @RequestBody UpdateDocumentRequest request,
             Authentication authentication
     ) {
@@ -98,9 +111,10 @@ public class DocumentController {
         return ResponseEntity.ok(ApiResponse.success(documentService.updateDocument(userId, id, request)));
     }
 
+    @Operation(summary = "Delete document", description = "Delete a document permanently by its ID.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDocument(
-            @PathVariable String id,
+            @Parameter(description = "The ID of the document to delete") @PathVariable String id,
             Authentication authentication
     ) {
         String userId = getUserId(authentication);

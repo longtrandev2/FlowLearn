@@ -4,6 +4,9 @@ import com.example.backend.dto.ApiResponse;
 import com.example.backend.dto.study.CreateStudySessionRequest;
 import com.example.backend.dto.study.StudySessionDto;
 import com.example.backend.service.study.StudySessionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Study Session", description = "Operations for study sessions (flashcards, quizzes)")
 @RestController
 @RequestMapping("/api/v1/study-sessions")
 @RequiredArgsConstructor
@@ -26,9 +30,10 @@ public class StudySessionController {
 
     private final StudySessionService studySessionService;
 
+    @Operation(summary = "Create a study session", description = "Create a new learning session for a specific target element.")
     @PostMapping
     public ResponseEntity<ApiResponse<StudySessionDto>> createSession(
-            Authentication authentication,
+            @Parameter(hidden = true) Authentication authentication,
             @Valid @RequestBody CreateStudySessionRequest request
     ) {
         return ResponseEntity.ok(ApiResponse.success(
@@ -36,31 +41,34 @@ public class StudySessionController {
         ));
     }
 
+    @Operation(summary = "Get user study sessions", description = "Retrieve a paginated list of all study sessions for the authenticated user.")
     @GetMapping
     public ResponseEntity<ApiResponse<Page<StudySessionDto>>> getUserSessions(
-            Authentication authentication,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @Parameter(hidden = true) Authentication authentication,
+            @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Number of items per page") @RequestParam(defaultValue = "10") int size
     ) {
         return ResponseEntity.ok(ApiResponse.success(
                 studySessionService.getUserSessions(authentication.getName(), PageRequest.of(page, size))
         ));
     }
 
+    @Operation(summary = "Get a specific session", description = "Retrieve details by a specific study session ID.")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<StudySessionDto>> getSession(
-            Authentication authentication,
-            @PathVariable String id
+            @Parameter(hidden = true) Authentication authentication,
+            @Parameter(description = "The ID of the session") @PathVariable String id
     ) {
         return ResponseEntity.ok(ApiResponse.success(
                 studySessionService.getSession(authentication.getName(), id)
         ));
     }
 
+    @Operation(summary = "End a study session", description = "Marks an active study session as ended and records completion time.")
     @PutMapping("/{id}/end")
     public ResponseEntity<ApiResponse<StudySessionDto>> endSession(
-            Authentication authentication,
-            @PathVariable String id
+            @Parameter(hidden = true) Authentication authentication,
+            @Parameter(description = "The session ID to end") @PathVariable String id
     ) {
         return ResponseEntity.ok(ApiResponse.success(
                 studySessionService.endSession(authentication.getName(), id)
