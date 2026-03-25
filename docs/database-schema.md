@@ -262,8 +262,7 @@ public class Folder {
 | name | VARCHAR(512) | NOT NULL | Filename |
 | file_type | ENUM | NOT NULL | PDF, DOCX, TXT, PPTX, XLSX |
 | file_size_bytes | BIGINT | NOT NULL | Size in bytes |
-| r2_key | VARCHAR(512) | NOT NULL | R2 object key |
-| r2_bucket | VARCHAR(255) | DEFAULT 'flowlearn-documents' | R2 bucket name |
+| cloudinary_id | VARCHAR(512) | NOT NULL | Cloudinary public ID |
 | status | ENUM | DEFAULT 'uploading' | uploading, processing, ready, error |
 | error_message | TEXT | NULL | Error if any |
 | page_count | INT | NULL | Number of pages (PDF) |
@@ -317,11 +316,8 @@ public class Document {
     @Column(name = "file_size_bytes", nullable = false)
     private Long fileSizeBytes;
 
-    @Column(name = "r2_key", nullable = false, length = 512)
-    private String r2Key;
-
-    @Column(name = "r2_bucket", length = 255)
-    private String r2Bucket = "flowlearn-documents";
+    @Column(name = "cloudinary_id", nullable = false, length = 512)
+    private String cloudinaryId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
