@@ -3,7 +3,9 @@ package com.example.backend.controller.study;
 import com.example.backend.dto.ApiResponse;
 import com.example.backend.dto.study.CreateStudySessionRequest;
 import com.example.backend.dto.study.StudySessionDto;
+import com.example.backend.dto.study.SummaryDto;
 import com.example.backend.service.study.StudySessionService;
+import com.example.backend.service.study.SummaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class StudySessionController {
 
     private final StudySessionService studySessionService;
+    private final SummaryService summaryService;
 
     @Operation(summary = "Create a study session", description = "Create a new learning session for a specific target element.")
     @PostMapping
@@ -72,6 +75,18 @@ public class StudySessionController {
     ) {
         return ResponseEntity.ok(ApiResponse.success(
                 studySessionService.endSession(authentication.getName(), id)
+        ));
+    }
+
+    @Operation(summary = "Get session summary", description = "Get AI-generated summary for the study session.")
+    @GetMapping("/{id}/summary")
+    public ResponseEntity<ApiResponse<SummaryDto>> getSessionSummary(
+            @Parameter(hidden = true) Authentication authentication,
+            @Parameter(description = "The session ID") @PathVariable String id,
+            @Parameter(description = "Optional goal override") @RequestParam(required = false) String goalId
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                summaryService.getOrCreateSessionSummary(authentication.getName(), id, goalId)
         ));
     }
 }

@@ -2,9 +2,12 @@ package com.example.backend.controller.study;
 
 import com.example.backend.dto.ApiResponse;
 import com.example.backend.dto.study.QuizDto;
+import com.example.backend.dto.study.QuizQuestionDto;
 import com.example.backend.dto.study.QuizResultDto;
 import com.example.backend.dto.study.SubmitQuizRequest;
 import com.example.backend.service.study.QuizService;
+
+import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -58,6 +61,28 @@ public class QuizController {
     ) {
         return ResponseEntity.ok(ApiResponse.success(
                 quizService.getQuizResult(authentication.getName(), resultId)
+        ));
+    }
+
+    @Operation(summary = "Get quiz details", description = "Get quiz metadata.")
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<QuizDto>> getQuiz(
+            @Parameter(hidden = true) Authentication authentication,
+            @Parameter(description = "The ID of the quiz") @PathVariable String id
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                quizService.getQuizById(authentication.getName(), id)
+        ));
+    }
+
+    @Operation(summary = "Get quiz questions", description = "Get all questions for a quiz (without correct answers).")
+    @GetMapping("/{id}/questions")
+    public ResponseEntity<ApiResponse<List<QuizQuestionDto>>> getQuizQuestions(
+            @Parameter(hidden = true) Authentication authentication,
+            @Parameter(description = "The ID of the quiz") @PathVariable String id
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                quizService.getQuizQuestions(authentication.getName(), id)
         ));
     }
 }

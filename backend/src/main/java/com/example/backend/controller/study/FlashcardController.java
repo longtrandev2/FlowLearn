@@ -3,6 +3,7 @@ package com.example.backend.controller.study;
 import com.example.backend.dto.ApiResponse;
 import com.example.backend.dto.study.FlashcardDto;
 import com.example.backend.dto.study.FlashcardProgressDto;
+import com.example.backend.dto.study.FlashcardStatsDto;
 import com.example.backend.dto.study.ReviewFlashcardRequest;
 import com.example.backend.service.study.FlashcardService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -64,6 +65,16 @@ public class FlashcardController {
     ) {
         return ResponseEntity.ok(ApiResponse.success(
                 flashcardService.reviewFlashcard(authentication.getName(), flashcardId, request)
+        ));
+    }
+
+    @Operation(summary = "Get flashcard stats", description = "Get SRS statistics for the user.")
+    @GetMapping("/stats")
+    public ResponseEntity<ApiResponse<FlashcardStatsDto>> getFlashcardStats(
+            @Parameter(hidden = true) Authentication authentication
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                flashcardService.getFlashcardStats(authentication.getName())
         ));
     }
 }

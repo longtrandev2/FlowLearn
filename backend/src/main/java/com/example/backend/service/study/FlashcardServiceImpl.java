@@ -2,6 +2,7 @@ package com.example.backend.service.study;
 
 import com.example.backend.dto.study.FlashcardDto;
 import com.example.backend.dto.study.FlashcardProgressDto;
+import com.example.backend.dto.study.FlashcardStatsDto;
 import com.example.backend.dto.study.ReviewFlashcardRequest;
 import com.example.backend.entity.Flashcard;
 import com.example.backend.entity.User;
@@ -222,6 +223,33 @@ public class FlashcardServiceImpl implements FlashcardService {
                 .lastReviewedAt(entity.getLastReviewedAt())
                 .lastQuality(entity.getLastQuality())
                 .flashcard(entity.getFlashcard() != null ? mapToFlashcardDto(entity.getFlashcard()) : null)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public FlashcardStatsDto getFlashcardStats(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        
+        long totalCards = progressRepository.countByUserId(user.getId());
+        long cardsDueToday = progressRepository.countDueByUserId(user.getId(), LocalDate.now());
+        long cardsReviewed = progressRepository.countReviewedByUserId(user.getId());
+        long cardsLearned = progressRepository.countLearnedByUserId(user.getId());
+        Double avgEase = progressRepository.getAverageEaseFactor(user.getId());
+        
+        double retentionRate = 0.0;
+        if (totalCards > 0) {
+            retentionRate = (double) cardsReviewed / totalCards * 100.0;
+        }
+
+        return FlashcardStatsDto.builder()
+                .totalCards(totalCards)
+                .cardsReviewed(cardsReviewed)
+                .cardsDueToday(cardsDueToday)
+                .cardsLearned(cardsLearned)
+                .averageEaseFactor(avgEase != null ? avgEase : 2.5) // default 2.5
+                .retentionRate(retentionRate)
                 .build();
     }
 }
