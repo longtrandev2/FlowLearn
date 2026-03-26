@@ -83,9 +83,9 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public List<FolderDto> getRootFolders(String userId) {
-        List<Folder> folders = folderRepository.findByUserIdAndParentIdIsNullOrderByCreatedAtDesc(userId);
-        return folders.stream().map(this::mapToDto).collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<FolderDto> getRootFolders(String userId, org.springframework.data.domain.Pageable pageable) {
+        return folderRepository.findByUserIdAndParentIdIsNull(userId, pageable).map(this::mapToDto);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class FolderServiceImpl implements FolderService {
         List<Folder> folders = folderRepository.findByUserIdAndParentIdOrderByCreatedAtDesc(userId, parentId);
         List<FolderDto> subfolders = folders.stream().map(this::mapToDto).collect(Collectors.toList());
         
-        List<com.example.backend.dto.document.DocumentDto> documents = documentService.getDocumentsInFolder(userId, parentId);
+        List<com.example.backend.dto.document.DocumentDto> documents = documentService.getDocumentsInFolder(userId, parentId, org.springframework.data.domain.Pageable.unpaged()).getContent();
         
         // Build breadcrumbs
         List<BreadcrumbDto> breadcrumbs = new ArrayList<>();
@@ -162,3 +162,6 @@ public class FolderServiceImpl implements FolderService {
                 .build();
     }
 }
+
+
+

@@ -70,14 +70,16 @@ public class DocumentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(document));
     }
 
-    @Operation(summary = "List documents", description = "Retrieve a list of documents in a specific folder or at the root level if no folderId is provided.")
+    @Operation(summary = "List documents", description = "Retrieve a paginated list of documents in a specific folder or at the root level if no folderId is provided.")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<DocumentDto>>> getDocuments(
+    public ResponseEntity<ApiResponse<org.springframework.data.domain.Page<DocumentDto>>> getDocuments(
             @Parameter(description = "Optional folder ID to filter documents") @RequestParam(value = "folderId", required = false) String folderId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
             Authentication authentication
     ) {
         String userId = getUserId(authentication);
-        return ResponseEntity.ok(ApiResponse.success(documentService.getDocumentsInFolder(userId, folderId)));
+        return ResponseEntity.ok(ApiResponse.success(documentService.getDocumentsInFolder(userId, folderId, org.springframework.data.domain.PageRequest.of(page, size))));
     }
 
     @Operation(summary = "Get document", description = "Retrieve a single document by its ID.")
@@ -128,3 +130,4 @@ public class DocumentController {
                 .getId();
     }
 }
+

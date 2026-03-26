@@ -1049,7 +1049,34 @@ Content-Type: application/json
 
 ---
 
-#### 4.4 Get Session Summary
+#### 4.4 Get Session Feedback
+
+**Endpoint:** `GET /api/v1/study-sessions/:id/feedback`
+
+**Description:** Get AI-generated evaluation and feedback for the completed study session. Depending on the design, this might trigger generation if it's the first time and the session is completed, or it could be a dedicated endpoint for generating.
+
+**Headers:**
+```
+Authorization: Bearer <accessToken>
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "studySessionId": "550e8400-e29b-41d4-a716-446655440000",
+    "weakAreas": ["Derivative rules", "Trigonometric functions"],
+    "suggestedFocus": "Focus more on chain rules with trigonometric functions based on your quiz mistakes.",
+    "overallScore": 85,
+    "createdAt": "2025-03-13T11:05:00Z"
+  }
+}
+```
+
+---
+
+#### 4.5 Get Session Summary
 
 **Endpoint:** `GET /api/v1/study-sessions/:id/summary`
 

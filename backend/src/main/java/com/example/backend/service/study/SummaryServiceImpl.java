@@ -34,19 +34,29 @@ public class SummaryServiceImpl implements SummaryService {
     private final FileStorageService fileStorageService;
 
     @Override
-    @Transactional
-    public SummaryDto getOrCreateSessionSummary(String userEmail, String sessionId, String overrideGoalId) {
+    @Transactional(readOnly = true)
+    public SummaryDto getSessionSummary(String userEmail, String sessionId) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         StudySession session = studySessionRepository.findByIdAndUserId(sessionId, user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
 
-        // If summary exists, return it
         Optional<Summary> existingSummary = summaryRepository.findFirstByStudySessionIdOrderByCreatedAtDesc(sessionId);
         if (existingSummary.isPresent()) {
             return mapToDto(existingSummary.get());
         }
+        return null;
+    }
+
+    @Override
+    @Transactional
+    public SummaryDto generateSessionSummary(String userEmail, String sessionId, String overrideGoalId) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        StudySession session = studySessionRepository.findByIdAndUserId(sessionId, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
 
         // Setup goal
         GoalId goalId = session.getGoalId();
@@ -80,24 +90,16 @@ public class SummaryServiceImpl implements SummaryService {
     }
     
     private String getSessionTextContent(StudySession session) {
-        // Simple case: session scope is FILE
-        if (session.getScope() == com.example.backend.enums.StudyScope.FILE) {
-            Document doc = documentRepository.findById(session.getScopeId())
-                    .orElseThrow(() -> new IllegalArgumentException("Document not found"));
-            
-            try {
-                return fileStorageService.downloadText(doc.getCloudinaryId() + ".txt");
-            } catch (Exception e) {
-                log.error("Failed to fetch text content for document {}", doc.getId(), e);
-                // Fallback or throw error. The user wants gracefulness.
-                return "Note: Content could not be extracted or is missing.";
-            }
-        } else if (session.getScope() == com.example.backend.enums.StudyScope.FOLDER) {
-            // Complex case: Folder contains multiple files. For now, merge them.
-            // ... (simplifying logic: just fetching the first document or concatenating)
-            return "Folder summary logic not fully implemented yet.";
+        Document doc = documentRepository.findById(session.getFileId())
+                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+
+        try {
+            return fileStorageService.downloadText(doc.getCloudinaryId() + ".txt");
+        } catch (Exception e) {
+            log.error("Failed to fetch text content for document {}", doc.getId(), e);
+            // Fallback or throw error. The user wants gracefulness.
+            return "Note: Content could not be extracted or is missing.";
         }
-        return "";
     }
 
     private SummaryDto mapToDto(Summary summary) {
@@ -111,3 +113,4 @@ public class SummaryServiceImpl implements SummaryService {
                 .build();
     }
 }
+

@@ -13,4 +13,5 @@ public interface QuizResultRepository extends JpaRepository<QuizResult, String> 
     Page<QuizResult> findByUserId(String userId, Pageable pageable);
     Page<QuizResult> findByQuizId(String quizId, Pageable pageable);
     Optional<QuizResult> findByIdAndUserId(String id, String userId);
+    Optional<QuizResult> findFirstByQuizIdAndUserIdOrderByCompletedAtDesc(String quizId, String userId);
 }

@@ -15,7 +15,8 @@ public interface DocumentService {
     
     com.example.backend.dto.document.DocumentStatusResponse getDocumentStatus(String userId, String documentId);
     
-    List<DocumentDto> getDocumentsInFolder(String userId, String folderId);
+    org.springframework.data.domain.Page<DocumentDto> getDocumentsInFolder(String userId, String folderId, org.springframework.data.domain.Pageable pageable);
     
     void deleteDocument(String userId, String documentId);
 }
+

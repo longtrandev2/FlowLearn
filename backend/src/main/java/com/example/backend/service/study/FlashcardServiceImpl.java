@@ -2,6 +2,7 @@ package com.example.backend.service.study;
 
 import com.example.backend.dto.study.FlashcardDto;
 import com.example.backend.dto.study.FlashcardProgressDto;
+import com.example.backend.dto.study.FlashcardStatsDto;
 import com.example.backend.dto.study.ReviewFlashcardRequest;
 import com.example.backend.entity.Flashcard;
 import com.example.backend.entity.User;
@@ -130,19 +131,14 @@ public class FlashcardServiceImpl implements FlashcardService {
 
     @Override
     @Transactional
-    public java.util.List<FlashcardDto> getOrGenerateFlashcards(String userEmail, String sessionId) {
+    public java.util.List<FlashcardDto> generateFlashcards(String userEmail, String sessionId, int quantity) {
         User user = getUserByEmail(userEmail);
         StudySession session = studySessionRepository.findByIdAndUserId(sessionId, user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Session not found or access denied"));
 
-        java.util.List<Flashcard> existingFlashcards = flashcardRepository.findByStudySessionId(sessionId, Pageable.unpaged()).getContent();
-        if (!existingFlashcards.isEmpty()) {
-            return existingFlashcards.stream().map(this::mapToFlashcardDto).toList();
-        }
-
         // Generate them
         String text = getSessionTextContent(session);
-        String jsonContent = aiGenerationService.generateFlashcards(session, text, 10); // generating 10 cards
+        String jsonContent = aiGenerationService.generateFlashcards(session, text, quantity);
         
         // Parse and save
         try {
@@ -156,7 +152,7 @@ public class FlashcardServiceImpl implements FlashcardService {
             for (java.util.Map<String, String> cardMap : cardsParsed) {
                 Flashcard fc = Flashcard.builder()
                         .id(UUID.randomUUID().toString())
-                        .documentId(session.getScopeId()) // Only exact for FILE scope
+                        .documentId(session.getFileId())
                         .studySessionId(sessionId)
                         .front(cardMap.get("front"))
                         .back(cardMap.get("back"))
@@ -174,17 +170,14 @@ public class FlashcardServiceImpl implements FlashcardService {
     }
 
     private String getSessionTextContent(StudySession session) {
-        if (session.getScope() == com.example.backend.enums.StudyScope.FILE) {
-            Document doc = documentRepository.findById(session.getScopeId())
-                    .orElseThrow(() -> new IllegalArgumentException("Document not found"));
-            try {
-                return fileStorageService.downloadText(doc.getCloudinaryId() + ".txt");
-            } catch (Exception e) {
-                log.error("Failed to fetch text content for document {}", doc.getId(), e);
-                return "Note: Content could not be extracted or is missing.";
-            }
+        Document doc = documentRepository.findById(session.getFileId())
+                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+        try {
+            return fileStorageService.downloadText(doc.getCloudinaryId() + ".txt");
+        } catch (Exception e) {
+            log.error("Failed to fetch text content for document {}", doc.getId(), e);
+            return "Note: Content could not be extracted or is missing.";
         }
-        return "";
     }
     
     private String extractJson(String raw) {
@@ -224,4 +217,32 @@ public class FlashcardServiceImpl implements FlashcardService {
                 .flashcard(entity.getFlashcard() != null ? mapToFlashcardDto(entity.getFlashcard()) : null)
                 .build();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public FlashcardStatsDto getFlashcardStats(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        
+        long totalCards = progressRepository.countByUserId(user.getId());
+        long cardsDueToday = progressRepository.countDueByUserId(user.getId(), LocalDate.now());
+        long cardsReviewed = progressRepository.countReviewedByUserId(user.getId());
+        long cardsLearned = progressRepository.countLearnedByUserId(user.getId());
+        Double avgEase = progressRepository.getAverageEaseFactor(user.getId());
+        
+        double retentionRate = 0.0;
+        if (totalCards > 0) {
+            retentionRate = (double) cardsReviewed / totalCards * 100.0;
+        }
+
+        return FlashcardStatsDto.builder()
+                .totalCards(totalCards)
+                .cardsReviewed(cardsReviewed)
+                .cardsDueToday(cardsDueToday)
+                .cardsLearned(cardsLearned)
+                .averageEaseFactor(avgEase != null ? avgEase : 2.5) // default 2.5
+                .retentionRate(retentionRate)
+                .build();
+    }
 }
+

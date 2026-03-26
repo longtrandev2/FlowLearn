@@ -140,16 +140,15 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<DocumentDto> getDocumentsInFolder(String userId, String folderId) {
-        List<Document> documents;
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<DocumentDto> getDocumentsInFolder(String userId, String folderId, org.springframework.data.domain.Pageable pageable) {
         if (folderId == null || folderId.isEmpty()) {
-            documents = documentRepository.findByUserIdAndFolderIdIsNullOrderByUploadedAtDesc(userId);
+            return documentRepository.findByUserIdAndFolderIdIsNull(userId, pageable).map(this::mapToDto);
         } else {
             folderRepository.findByIdAndUserId(folderId, userId)
                     .orElseThrow(() -> new IllegalArgumentException("Folder not found"));
-            documents = documentRepository.findByUserIdAndFolderIdOrderByUploadedAtDesc(userId, folderId);
+            return documentRepository.findByUserIdAndFolderId(userId, folderId, pageable).map(this::mapToDto);
         }
-        return documents.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     @Override
@@ -190,3 +189,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .build();
     }
 }
+
+
+
+

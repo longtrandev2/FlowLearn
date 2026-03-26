@@ -27,6 +27,12 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -66,7 +72,7 @@ public class QuizServiceImpl implements QuizService {
         // For now, getting the first quiz associated with the session.
         List<Quiz> quizzes = quizRepository.findByStudySessionId(sessionId, PageRequest.of(0, 1)).getContent();
         if (quizzes.isEmpty()) {
-            return generateAndSaveQuiz(session);
+            return null; // Return null if not explicitely generated yet
         }
         
         Quiz quiz = quizzes.get(0);
@@ -88,10 +94,29 @@ public class QuizServiceImpl implements QuizService {
     }
 
 
-    private QuizDto generateAndSaveQuiz(StudySession session) {
-        String stringLevel = "understand";
+        @Override
+    @Transactional
+    public QuizDto generateQuizForSession(String userEmail, String sessionId, int quantity, String cognitiveLevel) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        StudySession session = studySessionRepository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Study session not found"));
+
+        if (!session.getUserId().equals(user.getId())) {
+            throw new AccessDeniedException("You do not have permission to access this session's quiz");
+        }
+        
+        return generateAndSaveQuiz(session, quantity, cognitiveLevel);
+    }
+
+    private QuizDto generateAndSaveQuiz(StudySession session, int quantity, String StringLevel) {
+        String stringLevel = StringLevel;
+        if (stringLevel == null || stringLevel.isEmpty()) {
+            stringLevel = "understand";
+        }
         String text = getSessionTextContent(session);
-        String jsonContent = aiGenerationService.generateQuiz(session, text, stringLevel);
+        String jsonContent = aiGenerationService.generateQuiz(session, text, stringLevel, quantity);
         
         try {
             jsonContent = extractJson(jsonContent);
@@ -102,6 +127,7 @@ public class QuizServiceImpl implements QuizService {
                     .id(UUID.randomUUID().toString())
                     .studySessionId(session.getId())
                     .cognitiveLevel(com.example.backend.enums.CognitiveLevel.UNDERSTAND)
+                    .totalQuestions(questionsNode.isArray() ? questionsNode.size() : quantity)
                     .createdAt(java.time.LocalDateTime.now())
                     .build();
             quiz = quizRepository.save(quiz);
@@ -177,17 +203,14 @@ public class QuizServiceImpl implements QuizService {
     }
     
     private String getSessionTextContent(StudySession session) {
-        if (session.getScope() == com.example.backend.enums.StudyScope.FILE) {
-            Document doc = documentRepository.findById(session.getScopeId())
-                    .orElseThrow(() -> new IllegalArgumentException("Document not found"));
-            try {
-                return fileStorageService.downloadText(doc.getCloudinaryId() + ".txt");
-            } catch (Exception e) {
-                log.error("Failed to fetch text content for document {}", doc.getId(), e);
-                return "Note: Content could not be extracted or is missing.";
-            }
+        Document doc = documentRepository.findById(session.getFileId())
+                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+        try {
+            return fileStorageService.downloadText(doc.getCloudinaryId() + ".txt");
+        } catch (Exception e) {
+            log.error("Failed to fetch text content for document {}", doc.getId(), e);
+            return "Note: Content could not be extracted or is missing.";
         }
-        return "";
     }
 
     @Override    @Transactional
@@ -265,6 +288,59 @@ public class QuizServiceImpl implements QuizService {
         return mapToResultDto(result);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public QuizDto getQuizById(String userEmail, String quizId) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new IllegalArgumentException("Quiz not found"));
+
+        StudySession session = studySessionRepository.findById(quiz.getStudySessionId())
+                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+
+        if (!session.getUserId().equals(user.getId())) {
+            throw new AccessDeniedException("You do not have permission to access this quiz");
+        }
+
+        // Return quiz metadata without full question details
+        return QuizDto.builder()
+                .id(quiz.getId())
+                .studySessionId(quiz.getStudySessionId())
+                .cognitiveLevel(quiz.getCognitiveLevel())
+                .totalQuestions(quiz.getTotalQuestions())
+                .createdAt(quiz.getCreatedAt())
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<QuizQuestionDto> getQuizQuestions(String userEmail, String quizId) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new IllegalArgumentException("Quiz not found"));
+
+        StudySession session = studySessionRepository.findById(quiz.getStudySessionId())
+                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+
+        if (!session.getUserId().equals(user.getId())) {
+            throw new AccessDeniedException("You do not have permission to access this quiz");
+        }
+
+        return quizQuestionRepository.findByQuizIdOrderByQuestionIndexAsc(quizId)
+                .stream()
+                .map(q -> QuizQuestionDto.builder()
+                        .id(q.getId())
+                        .question(q.getQuestion())
+                        .options(q.getOptions())
+                        .questionIndex(q.getQuestionIndex())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
     private QuizResultDto mapToResultDto(QuizResult result) {
         return QuizResultDto.builder()
                 .id(result.getId())
@@ -277,5 +353,8 @@ public class QuizServiceImpl implements QuizService {
                 .build();
     }
 }
+
+
+
 
 

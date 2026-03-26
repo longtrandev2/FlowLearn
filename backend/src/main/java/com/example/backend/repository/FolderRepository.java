@@ -14,6 +14,8 @@ public interface FolderRepository extends JpaRepository<Folder, String> {
 
     List<Folder> findByUserIdAndParentIdIsNullOrderByCreatedAtDesc(String userId);
 
+    org.springframework.data.domain.Page<Folder> findByUserIdAndParentIdIsNull(String userId, org.springframework.data.domain.Pageable pageable);
+
     List<Folder> findByUserIdAndParentIdOrderByCreatedAtDesc(String userId, String parentId);
 
     Optional<Folder> findByIdAndUserId(String id, String userId);
@@ -24,5 +26,8 @@ public interface FolderRepository extends JpaRepository<Folder, String> {
     @Query("SELECT f FROM Folder f WHERE f.userId = :userId AND f.parentId IS NULL AND f.name = :name")
     Optional<Folder> findByUserIdAndParentIdIsNullAndName(@Param("userId") String userId, @Param("name") String name);
 
+    long countByUserId(String userId);
+
     long countByParentId(String parentId);
 }
+
