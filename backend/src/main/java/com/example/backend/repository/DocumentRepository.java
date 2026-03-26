@@ -20,6 +20,8 @@ public interface DocumentRepository extends JpaRepository<Document, String> {
 
     Page<Document> findByUserIdAndFolderIdIsNull(String userId, Pageable pageable);
 
+    Page<Document> findByUserId(String userId, Pageable pageable);
+
     Optional<Document> findByIdAndUserId(String id, String userId);
 
     long countByUserId(String userId);
