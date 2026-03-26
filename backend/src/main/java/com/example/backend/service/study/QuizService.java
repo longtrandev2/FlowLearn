@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface QuizService {
     QuizDto getQuizBySession(String userEmail, String sessionId);
+    QuizDto generateQuizForSession(String userEmail, String sessionId, int quantity, String cognitiveLevel);
     QuizDto getQuizById(String userEmail, String quizId);
     List<QuizQuestionDto> getQuizQuestions(String userEmail, String quizId);
     QuizResultDto submitQuizResult(String userEmail, String quizId, SubmitQuizRequest request);

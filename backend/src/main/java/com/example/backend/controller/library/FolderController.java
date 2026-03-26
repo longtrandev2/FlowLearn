@@ -46,11 +46,15 @@ public class FolderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(folder));
     }
 
-    @Operation(summary = "List root folders", description = "Get all root level folders for the authenticated user.")
+    @Operation(summary = "List root folders", description = "Get paginated root level folders for the authenticated user.")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<FolderDto>>> getRootFolders(Authentication authentication) {
+    public ResponseEntity<ApiResponse<org.springframework.data.domain.Page<FolderDto>>> getRootFolders(
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "20") int size,
+            Authentication authentication
+    ) {
         String userId = getUserId(authentication);
-        return ResponseEntity.ok(ApiResponse.success(folderService.getRootFolders(userId)));
+        return ResponseEntity.ok(ApiResponse.success(folderService.getRootFolders(userId, org.springframework.data.domain.PageRequest.of(page, size))));
     }
 
     @Operation(summary = "Get folder details", description = "Retrieve details for a specific folder by ID.")
@@ -101,3 +105,4 @@ public class FolderController {
                 .getId();
     }
 }
+

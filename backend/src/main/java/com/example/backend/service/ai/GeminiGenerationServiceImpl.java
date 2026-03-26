@@ -64,12 +64,12 @@ public class GeminiGenerationServiceImpl implements AiGenerationService {
     }
 
     @Override
-    public String generateQuiz(StudySession session, String documentText, String cognitiveLevel) {
-        log.info("Generating quiz (level: {}) for session: {}", cognitiveLevel, session.getId());
-        
+    public String generateQuiz(StudySession session, String documentText, String cognitiveLevel, int quantity) {
+        log.info("Generating quiz (level: {}, quantity: {}) for session: {}", cognitiveLevel, quantity, session.getId());
+
         // Generate a standard multiple choice quiz format
         String prompt = String.format(
-            "Based on the following text, generate a 10-question multiple-choice quiz targeting the cognitive level '%s' and learning goal '%s'.\n" +
+            "Based on the following text, generate a %d-question multiple-choice quiz targeting the cognitive level '%s' and learning goal '%s'.\n" +
             "Respond ONLY with a JSON object. Do not include markdown blocks like ```json.\n" +
             "The JSON must have a single key 'questions' containing an array of objects.\n" +
             "Each question object must follow this exact format: \n" +
@@ -79,9 +79,8 @@ public class GeminiGenerationServiceImpl implements AiGenerationService {
             "  \"correctIndex\": 0,\n" +
             "  \"explanation\": \"Why this is requested\"\n" +
             "}\n\n" +
-            "TEXT:\n%s", 
-            cognitiveLevel, session.getGoalId(), truncateText(documentText, 50000)
-        );
+            "TEXT:\n%s",
+            quantity, cognitiveLevel, session.getGoalId(), truncateText(documentText, 50000));
         
         return callGeminiApi(prompt);
     }

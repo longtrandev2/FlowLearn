@@ -13,9 +13,10 @@ public interface FolderService {
     
     FolderDto getFolder(String userId, String folderId);
     
-    List<FolderDto> getRootFolders(String userId);
+    org.springframework.data.domain.Page<FolderDto> getRootFolders(String userId, org.springframework.data.domain.Pageable pageable);
     
     com.example.backend.dto.folder.FolderContentsDto getFolderContents(String userId, String folderId);
     
     void deleteFolder(String userId, String folderId);
 }
+

@@ -72,7 +72,7 @@ public class QuizServiceImpl implements QuizService {
         // For now, getting the first quiz associated with the session.
         List<Quiz> quizzes = quizRepository.findByStudySessionId(sessionId, PageRequest.of(0, 1)).getContent();
         if (quizzes.isEmpty()) {
-            return generateAndSaveQuiz(session);
+            return null; // Return null if not explicitely generated yet
         }
         
         Quiz quiz = quizzes.get(0);
@@ -94,10 +94,29 @@ public class QuizServiceImpl implements QuizService {
     }
 
 
-    private QuizDto generateAndSaveQuiz(StudySession session) {
-        String stringLevel = "understand";
+        @Override
+    @Transactional
+    public QuizDto generateQuizForSession(String userEmail, String sessionId, int quantity, String cognitiveLevel) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        StudySession session = studySessionRepository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Study session not found"));
+
+        if (!session.getUserId().equals(user.getId())) {
+            throw new AccessDeniedException("You do not have permission to access this session's quiz");
+        }
+        
+        return generateAndSaveQuiz(session, quantity, cognitiveLevel);
+    }
+
+    private QuizDto generateAndSaveQuiz(StudySession session, int quantity, String StringLevel) {
+        String stringLevel = StringLevel;
+        if (stringLevel == null || stringLevel.isEmpty()) {
+            stringLevel = "understand";
+        }
         String text = getSessionTextContent(session);
-        String jsonContent = aiGenerationService.generateQuiz(session, text, stringLevel);
+        String jsonContent = aiGenerationService.generateQuiz(session, text, stringLevel, quantity);
         
         try {
             jsonContent = extractJson(jsonContent);
@@ -108,6 +127,7 @@ public class QuizServiceImpl implements QuizService {
                     .id(UUID.randomUUID().toString())
                     .studySessionId(session.getId())
                     .cognitiveLevel(com.example.backend.enums.CognitiveLevel.UNDERSTAND)
+                    .totalQuestions(questionsNode.isArray() ? questionsNode.size() : quantity)
                     .createdAt(java.time.LocalDateTime.now())
                     .build();
             quiz = quizRepository.save(quiz);
@@ -183,17 +203,14 @@ public class QuizServiceImpl implements QuizService {
     }
     
     private String getSessionTextContent(StudySession session) {
-        if (session.getScope() == com.example.backend.enums.StudyScope.FILE) {
-            Document doc = documentRepository.findById(session.getScopeId())
-                    .orElseThrow(() -> new IllegalArgumentException("Document not found"));
-            try {
-                return fileStorageService.downloadText(doc.getCloudinaryId() + ".txt");
-            } catch (Exception e) {
-                log.error("Failed to fetch text content for document {}", doc.getId(), e);
-                return "Note: Content could not be extracted or is missing.";
-            }
+        Document doc = documentRepository.findById(session.getFileId())
+                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+        try {
+            return fileStorageService.downloadText(doc.getCloudinaryId() + ".txt");
+        } catch (Exception e) {
+            log.error("Failed to fetch text content for document {}", doc.getId(), e);
+            return "Note: Content could not be extracted or is missing.";
         }
-        return "";
     }
 
     @Override    @Transactional
@@ -336,5 +353,8 @@ public class QuizServiceImpl implements QuizService {
                 .build();
     }
 }
+
+
+
 
 

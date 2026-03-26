@@ -13,7 +13,9 @@ import java.util.Optional;
 public interface FlashcardRepository extends JpaRepository<Flashcard, String> {
     Page<Flashcard> findByStudySessionId(String studySessionId, Pageable pageable);
     List<Flashcard> findByDocumentId(String documentId);
-    
+
+    long countByStudySessionUserId(String userId);
+
     // Find directly by joined study session user
     Optional<Flashcard> findByIdAndStudySessionUserId(String id, String userId);
 }

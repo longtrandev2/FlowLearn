@@ -1,9 +1,7 @@
 package com.example.backend.entity;
 
 import com.example.backend.entity.converter.GoalIdConverter;
-import com.example.backend.entity.converter.StudyScopeConverter;
 import com.example.backend.enums.GoalId;
-import com.example.backend.enums.StudyScope;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -32,7 +30,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "study_sessions", indexes = {
         @Index(name = "idx_user_id", columnList = "user_id"),
-        @Index(name = "idx_scope", columnList = "scope,scope_id")
+        @Index(name = "idx_file_id", columnList = "file_id")
 })
 @EntityListeners(AuditingEntityListener.class)
 public class StudySession {
@@ -48,12 +46,8 @@ public class StudySession {
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
-    @Convert(converter = StudyScopeConverter.class)
-    @Column(nullable = false, length = 16)
-    private StudyScope scope;
-
-    @Column(name = "scope_id", length = 36, nullable = false)
-    private String scopeId;
+    @Column(name = "file_id", length = 36, nullable = false)
+    private String fileId;
 
     @Convert(converter = GoalIdConverter.class)
     @Column(name = "goal_id", nullable = false, length = 64)

@@ -38,19 +38,14 @@ public class StudySessionServiceImpl implements StudySessionService {
     public StudySessionDto createSession(String userEmail, CreateStudySessionRequest request) {
         User user = getUserByEmail(userEmail);
 
-        // Validate scope ownership to prevent IDOR
-        if (request.scope() == com.example.backend.enums.StudyScope.FILE) {
-            documentRepository.findByIdAndUserId(request.scopeId(), user.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Document not found or access denied"));
-        } else {
-            throw new IllegalArgumentException("Only FILE scope is permitted for study sessions");
-        }
+        // Validate file ownership to prevent IDOR
+        documentRepository.findByIdAndUserId(request.fileId(), user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Document not found or access denied"));
 
         StudySession session = StudySession.builder()
                 .id(UUID.randomUUID().toString())
                 .userId(user.getId())
-                .scope(request.scope())
-                .scopeId(request.scopeId())
+                .fileId(request.fileId())
                 .goalId(request.goalId())
                 .startedAt(LocalDateTime.now())
                 .totalTimeSeconds(0)
@@ -100,31 +95,10 @@ public class StudySessionServiceImpl implements StudySessionService {
                 .orElseThrow(() -> new AccessDeniedException("User not found"));
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public com.example.backend.dto.study.SummaryDto getSessionSummary(String userEmail, String sessionId, String goalIdStr) {
-        return summaryService.getOrCreateSessionSummary(userEmail, sessionId, goalIdStr);
-    }
-
-    @Override
-    @Transactional
-    public java.util.List<com.example.backend.dto.study.FlashcardDto> getSessionFlashcards(String userEmail, String sessionId) {
-        return flashcardService.getOrGenerateFlashcards(userEmail, sessionId);
-    }
-
-    @Override
-    @Transactional
-    public com.example.backend.dto.study.QuizDto getSessionQuiz(String userEmail, String sessionId, String cognitiveLevel) {
-        // cognitiveLevel isn't fully wired into existing getQuizBySession yet, but we map it if necessary 
-        // For now getQuizBySession generates if missing.
-        return quizService.getQuizBySession(userEmail, sessionId);
-    }
-
     private StudySessionDto mapToDto(StudySession session) {
         return StudySessionDto.builder()
                 .id(session.getId())
-                .scope(session.getScope())
-                .scopeId(session.getScopeId())
+                .fileId(session.getFileId())
                 .goalId(session.getGoalId())
                 .startedAt(session.getStartedAt())
                 .completedAt(session.getCompletedAt())
