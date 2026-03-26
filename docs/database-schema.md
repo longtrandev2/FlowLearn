@@ -412,6 +412,28 @@ public class StudySession {
 
 ---
 
+### 4.5. session_feedbacks
+
+**Description:** AI-generated evaluation and feedback on a user's performance after completing a study session based on flashcards and quiz.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | CHAR(36) | PRIMARY KEY | UUID v4 |
+| study_session_id | CHAR(36) | NOT NULL, FK | Parent session |
+| weak_areas | JSON | NULL | Array of identified weak areas |
+| suggested_focus | TEXT | NULL | Recommendations from AI |
+| overall_score | INT | NULL | Computed completion score (0-100) |
+| created_at | DATETIME | DEFAULT NOW() | Generation time |
+
+**Indexes:**
+- PRIMARY KEY: `id`
+- INDEX: `idx_study_session_id (study_session_id)`
+
+**Foreign Keys:**
+- `study_session_id` → `study_sessions(id)` ON DELETE CASCADE
+
+---
+
 ### 5. summaries
 
 **Description:** AI-generated summaries based on learning goals.
