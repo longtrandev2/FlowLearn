@@ -1,6 +1,3 @@
-Bản README này được thiết kế để biến dự án **FlowLearn** từ một bản "clone" thông thường thành một dự án cấp độ **Enterprise-ready** trong mắt các nhà tuyển dụng. Nó làm nổi bật các kỹ năng xử lý bất đồng bộ, thuật toán thông minh và tư duy hệ thống của bạn.
-
----
 
 # FlowLearn — Nền Tảng SaaS Giáo Dục Tích Hợp AI 🚀
 
